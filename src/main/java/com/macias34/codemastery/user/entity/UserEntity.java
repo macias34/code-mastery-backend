@@ -1,4 +1,4 @@
-package com.macias34.codemastery.user.model;
+package com.macias34.codemastery.user.entity;
 
 import java.sql.Timestamp;
 
@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import jakarta.persistence.GenerationType;
 
@@ -14,7 +15,8 @@ import jakarta.persistence.GenerationType;
 @Table(name = "user_")
 @Getter
 @Setter
-public class User {
+@NoArgsConstructor
+public class UserEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
@@ -24,7 +26,7 @@ public class User {
 	private String role;
 	private String password;
 
-	public User(String username, String email, String password, Timestamp createdAt, String role) {
+	public UserEntity(String username, String email, String password, Timestamp createdAt, String role) {
 		this.username = username;
 		this.email = email;
 		this.password = password;

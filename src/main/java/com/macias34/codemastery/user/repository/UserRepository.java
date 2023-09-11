@@ -1,9 +1,8 @@
 package com.macias34.codemastery.user.repository;
 
+import com.macias34.codemastery.user.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.macias34.codemastery.user.model.User;
-
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
 }
