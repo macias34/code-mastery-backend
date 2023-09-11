@@ -32,7 +32,7 @@ public class UserController {
 		Timestamp createdAt = DateTimeUtil.getCurrentTimestamp();
 
 		UserEntity userToSave = new UserEntity(user.getUsername(), user.getEmail(), user.getPassword(), createdAt,
-				UserRole.USER.toString());
+				UserRole.USER);
 
 		userRepository.save(userToSave);
 	}
