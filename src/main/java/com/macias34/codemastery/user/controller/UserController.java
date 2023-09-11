@@ -30,7 +30,7 @@ public class UserController {
 	}
 
 	@PostMapping("/users")
-	public void signUp(@RequestParam User user) {
+	public void signUp(@RequestBody User user) {
 
 		Timestamp createdAt = DateTimeUtil.getCurrentTimestamp();
 
