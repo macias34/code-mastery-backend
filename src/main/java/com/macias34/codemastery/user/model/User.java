@@ -24,10 +24,10 @@ public class User {
 	private String role;
 	private String password;
 
-	public User(String username, String email, String passwordHash, Timestamp createdAt, String role) {
+	public User(String username, String email, String password, Timestamp createdAt, String role) {
 		this.username = username;
 		this.email = email;
-		this.password = passwordHash;
+		this.password = password;
 		this.createdAt = createdAt;
 		this.role = role;
 	}
