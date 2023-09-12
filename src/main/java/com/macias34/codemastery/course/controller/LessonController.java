@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/lesson")
 @RequiredArgsConstructor
@@ -28,6 +30,13 @@ public class LessonController {
             @PathVariable int id
     ){
         return ResponseEntity.ok(lessonService.getLessonById(id));
+    }
+
+    @GetMapping("/chapter/{id}")
+    public ResponseEntity<List<LessonDto>> getLessonsByChapterId(
+            @PathVariable int id
+    ){
+        return ResponseEntity.ok(lessonService.getLessonsByChapterId(id));
     }
 
     @DeleteMapping("/{id}")

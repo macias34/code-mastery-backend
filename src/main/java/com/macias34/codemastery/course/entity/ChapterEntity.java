@@ -1,5 +1,6 @@
 package com.macias34.codemastery.course.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -29,7 +30,7 @@ public class ChapterEntity {
     private int id;
     private String name;
 
-    @OneToMany(mappedBy = "chapter")
+    @OneToMany(mappedBy = "chapter",cascade = CascadeType.ALL)
     private List<LessonEntity> lessons;
 
     @ManyToOne

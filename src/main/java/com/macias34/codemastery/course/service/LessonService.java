@@ -32,6 +32,7 @@ public class LessonService {
         this.chapterRepository = chapterRepository;
     }
 
+    //TODO File upload
     @Transactional
     public LessonDto createLesson(CreateLessonDto dto){
         ChapterEntity chapter = chapterRepository.findById(dto.getChapterId()).orElseThrow(()-> new ResourceNotFoundException("Chapter not found"));
@@ -68,5 +69,13 @@ public class LessonService {
         LessonEntity lesson = lessonRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Lesson not found"));
 
         return lessonMapper.fromEntityToDto(lesson);
+    }
+
+    public List<LessonDto> getLessonsByChapterId(int chapterId){
+        List<LessonEntity> lessons = lessonRepository.findLessonEntitiesByChapter_Id(chapterId);
+        if(lessons.isEmpty()){
+            throw new ResourceNotFoundException("Lessons not found");
+        }
+        return lessons.stream().map(lessonMapper::fromEntityToDto).toList();
     }
 }
