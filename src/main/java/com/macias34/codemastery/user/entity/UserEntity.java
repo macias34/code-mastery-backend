@@ -31,8 +31,8 @@ import jakarta.persistence.GenerationType;
 @Getter
 @Setter
 @NoArgsConstructor
-@Builder
 @AllArgsConstructor
+@Builder
 public class UserEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,11 +49,8 @@ public class UserEntity {
 	private List<OrderEntity> orders;
 
 	@ManyToMany
-	@JoinTable(
-			name = "user_course",
-			joinColumns = { @JoinColumn(name = "userId") },
-			inverseJoinColumns = { @JoinColumn(name = "courseId") }
-	)
+	@JoinTable(name = "user_course", joinColumns = { @JoinColumn(name = "userId") }, inverseJoinColumns = {
+			@JoinColumn(name = "courseId") })
 	private Set<CourseEntity> courses = new HashSet<>();
 
 	public UserEntity(String username, String email, String password, Timestamp createdAt, UserRole role) {
