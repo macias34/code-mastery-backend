@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,4 +16,6 @@ public class CreateCourseDto {
     private double price;
     private String instructorName;
     private String description;
+
+    private Set<Integer> categoriesIds;
 }

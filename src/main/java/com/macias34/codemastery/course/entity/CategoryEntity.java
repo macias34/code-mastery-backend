@@ -30,7 +30,7 @@ public class CategoryEntity {
     private String name;
 
     @ManyToMany(mappedBy = "categories")
-    private Set<CourseEntity> employees = new HashSet<>();
+    private Set<CourseEntity> courses = new HashSet<>();
 
     public CategoryEntity(String name){
         this.name = name;
