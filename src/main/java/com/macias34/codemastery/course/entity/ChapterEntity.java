@@ -33,7 +33,7 @@ public class ChapterEntity {
     private List<LessonEntity> lessons;
 
     @ManyToOne
-    @JoinColumn(name = "courseId", referencedColumnName = "id")
+    @JoinColumn(name = "course_id", referencedColumnName = "id")
     private CourseEntity course;
 
     public ChapterEntity(String name, CourseEntity course){

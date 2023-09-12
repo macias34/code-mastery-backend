@@ -27,7 +27,7 @@ public class LessonEntity {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "chapterId", referencedColumnName = "id")
+    @JoinColumn(name = "chapter_id", referencedColumnName = "id")
     private ChapterEntity chapter;
 
     public LessonEntity(String name, ChapterEntity chapter){

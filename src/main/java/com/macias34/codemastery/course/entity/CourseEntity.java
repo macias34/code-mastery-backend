@@ -2,6 +2,7 @@ package com.macias34.codemastery.course.entity;
 
 import com.macias34.codemastery.order.entity.OrderEntity;
 import com.macias34.codemastery.user.entity.UserEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -35,17 +36,21 @@ public class CourseEntity {
     private int id;
     private String name;
     private double price;
+    @Column(name = "instructor_name")
     private String instructorName;
+    @Column(name = "participants_count")
     private int participantsCount;
+    @Column(name = "created_at")
     private Timestamp createdAt;
+    @Column(name = "updated_at")
     private Timestamp updatedAt;
     private String description;
 
     @ManyToMany
     @JoinTable(
             name = "course_category",
-            joinColumns = { @JoinColumn(name = "courseId") },
-            inverseJoinColumns = { @JoinColumn(name = "categoryId") }
+            joinColumns = { @JoinColumn(name = "course_id") },
+            inverseJoinColumns = { @JoinColumn(name = "category_id") }
     )
     private Set<CategoryEntity> categories = new HashSet<>();
 

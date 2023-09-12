@@ -1,0 +1,56 @@
+package com.macias34.codemastery.course.controller;
+
+
+import com.macias34.codemastery.course.dto.category.CategoryDto;
+import com.macias34.codemastery.course.dto.lesson.CreateLessonDto;
+import com.macias34.codemastery.course.dto.lesson.LessonDto;
+import com.macias34.codemastery.course.dto.lesson.UpdateLessonDto;
+import com.macias34.codemastery.course.service.LessonService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/lesson")
+@RequiredArgsConstructor
+public class LessonController {
+    private final LessonService lessonService;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<LessonDto> getLessonById(
+            @PathVariable int id
+    ){
+        return ResponseEntity.ok(lessonService.getLessonById(id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<LessonDto> removeLessonById(
+            @PathVariable int id
+    ){
+        return ResponseEntity.ok(lessonService.deleteLessonById(id));
+    }
+
+    //TODO Handle file upload
+    @PostMapping("/")
+    public ResponseEntity<LessonDto> createLesson(
+            @RequestBody CreateLessonDto dto
+    ){
+        return ResponseEntity.ok(lessonService.createLesson(dto));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<LessonDto> updateLesson(
+            @PathVariable int id,
+            @RequestBody UpdateLessonDto dto
+
+    ){
+        return ResponseEntity.ok(lessonService.updateLessonById(id,dto));
+    }
+}

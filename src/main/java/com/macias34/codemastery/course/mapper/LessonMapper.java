@@ -5,7 +5,7 @@ import com.macias34.codemastery.course.dto.lesson.LessonDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface LessonMapper {
     @Mapping(target = "chapterId", source = "chapter.id")
     LessonDto fromEntityToDto(LessonEntity lessonEntity);
