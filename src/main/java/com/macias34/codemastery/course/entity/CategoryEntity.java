@@ -1,5 +1,6 @@
 package com.macias34.codemastery.course.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -29,7 +30,7 @@ public class CategoryEntity {
     private String name;
 
     @ManyToMany(mappedBy = "categories")
-    private Set<CourseEntity> employees = new HashSet<>();
+    private Set<CourseEntity> courses = new HashSet<>();
 
     public CategoryEntity(String name){
         this.name = name;
