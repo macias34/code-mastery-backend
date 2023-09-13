@@ -17,10 +17,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-public class JWTAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	@Autowired
-	private JWTGenerator tokenGenerator;
+	private JwtGenerator tokenGenerator;
 	@Autowired
 	private CustomUserDetailService customUserDetailsService;
 

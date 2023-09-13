@@ -13,7 +13,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
-public class JWTGenerator {
+public class JwtGenerator {
 
 	public String generateToken(Authentication authentication) {
 		String username = authentication.getName();

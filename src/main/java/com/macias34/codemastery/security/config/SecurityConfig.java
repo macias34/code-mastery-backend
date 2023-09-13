@@ -12,8 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.macias34.codemastery.security.jwt.JWTAuthenticationFilter;
-import com.macias34.codemastery.security.jwt.JWTEntryPoint;
+import com.macias34.codemastery.security.jwt.JwtAuthenticationFilter;
+import com.macias34.codemastery.security.jwt.JwtEntryPoint;
 import com.macias34.codemastery.security.service.CustomUserDetailService;
 import lombok.AllArgsConstructor;
 
@@ -23,7 +23,7 @@ import lombok.AllArgsConstructor;
 public class SecurityConfig {
 
 	private CustomUserDetailService userDetailService;
-	private JWTEntryPoint authEntryPoint;
+	private JwtEntryPoint authEntryPoint;
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -57,7 +57,7 @@ public class SecurityConfig {
 	};
 
 	@Bean
-	public JWTAuthenticationFilter jwtAuthenticationFilter() {
-		return new JWTAuthenticationFilter();
+	public JwtAuthenticationFilter jwtAuthenticationFilter() {
+		return new JwtAuthenticationFilter();
 	}
 }

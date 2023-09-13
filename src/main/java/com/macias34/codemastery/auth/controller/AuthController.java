@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.macias34.codemastery.auth.dto.AuthResponseDto;
 import com.macias34.codemastery.auth.dto.SignInDto;
 import com.macias34.codemastery.auth.dto.SignUpDto;
-import com.macias34.codemastery.security.jwt.JWTGenerator;
+import com.macias34.codemastery.security.jwt.JwtGenerator;
 import com.macias34.codemastery.user.entity.UserEntity;
 import com.macias34.codemastery.user.entity.UserRole;
 import com.macias34.codemastery.user.repository.UserRepository;
@@ -31,7 +31,7 @@ public class AuthController {
 	private AuthenticationManager authenticationManager;
 	private UserRepository userRepository;
 	private PasswordEncoder passwordEncoder;
-	private JWTGenerator jwtGenerator;
+	private JwtGenerator jwtGenerator;
 
 	@PostMapping("/sign-up")
 	public ResponseEntity<String> signUp(@RequestBody SignUpDto signUpDto) {
