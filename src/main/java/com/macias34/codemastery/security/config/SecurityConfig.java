@@ -45,17 +45,6 @@ public class SecurityConfig {
 
 	}
 
-	// @Bean
-	// public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-	// http.csrf().disable().authorizeRequests()
-	// .requestMatchers("/auth/**").permitAll()
-	// .anyRequest().authenticated()
-	// .and().httpBasic();
-
-	// return http.build();
-
-	// }
-
 	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
 			throws Exception {

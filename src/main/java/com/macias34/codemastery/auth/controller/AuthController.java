@@ -52,11 +52,13 @@ public class AuthController {
 
 	@PostMapping("/sign-in")
 	public ResponseEntity<AuthResponseDto> signIn(@RequestBody SignInDto signInDto) {
+
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(signInDto.getUsername(), signInDto.getPassword()));
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		String token = jwtGenerator.generateToken(authentication);
+
 		return new ResponseEntity<>(new AuthResponseDto(token), HttpStatus.OK);
 	}
 }

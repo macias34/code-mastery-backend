@@ -2,6 +2,6 @@ package com.macias34.codemastery.security.constants;
 
 public class SecurityConstants {
 	public static final long JWT_EXPIRATION = 70000;
-	public static final String JWT_SECRET = "secret";
+	public static final String JWT_SECRET = "ZkfJE1lJT0SNovFwcGG2tzcq7HwHhM4Np9gvEByNPZ7YxlLCsD5qhBCjBz0G3F35y4PYcp1QQBto2/y4vgeboyQ2CERPiB2uTLOrqTc846c2jddSjmYGdd0LoCVp9c0HrxjbxCBsSfDSMe5bWEmMMSxjfhregYTGpT0bbVyOiKDgLSprRPbyVks0iAsxitOp9ypDLt9UzhX8YMKNiUesYDdDrgZ8dNI3jxBRuw==";
 
 }
