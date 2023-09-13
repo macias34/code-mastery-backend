@@ -42,6 +42,7 @@ public class JwtGenerator {
 		}
 
 		catch (Exception exception) {
+			System.out.println(exception.getMessage());
 			throw new AuthenticationCredentialsNotFoundException("JWT was expired or incorrect.");
 		}
 	}

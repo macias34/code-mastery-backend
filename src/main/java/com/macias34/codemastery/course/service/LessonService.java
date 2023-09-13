@@ -8,6 +8,7 @@ import com.macias34.codemastery.course.entity.LessonEntity;
 import com.macias34.codemastery.course.mapper.LessonMapper;
 import com.macias34.codemastery.course.repository.ChapterRepository;
 import com.macias34.codemastery.course.repository.LessonRepository;
+import com.macias34.codemastery.exception.BadRequestException;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
 import com.macias34.codemastery.exception.StorageException;
 import jakarta.transaction.Transactional;
@@ -45,13 +46,15 @@ public class LessonService {
         chapter.setLessons(lessons);
 
         try{
-            //TODO ID IS ALWAYS 0
-            storageService.save(file,lesson.getId());
             lessonRepository.save(lesson);
+            storageService.save(file,lesson.getId());
             chapterRepository.save(chapter);
         }catch (Exception e){
-            throw e;
-//            throw new StorageException("Error with saving file occured");
+            lessonRepository.deleteById(lesson.getId());
+            if(e instanceof BadRequestException){
+                throw e;
+            }
+            throw new StorageException("Error with saving file occured");
         }
         return lessonMapper.fromEntityToDto(lesson);
     }
@@ -59,7 +62,12 @@ public class LessonService {
     public LessonDto deleteLessonById(int id){
         LessonEntity lesson = lessonRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Lesson not found"));
 
-        lessonRepository.deleteById(lesson.getId());
+        try{
+            storageService.deleteByfileName(String.valueOf(lesson.getId())+".mp4");
+            lessonRepository.deleteById(lesson.getId());
+        }catch (Exception e){
+            throw new StorageException("Error with removing file occured");
+        }
 
         return lessonMapper.fromEntityToDto(lesson);
     }

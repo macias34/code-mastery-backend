@@ -1,6 +1,8 @@
 package com.macias34.codemastery.course.service;
 
+import com.macias34.codemastery.exception.BadRequestException;
 import org.apache.tika.Tika;
+import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -30,11 +32,21 @@ public class FileStorageService {
     public void save(MultipartFile file, Integer lessonId) {
 
         try {
-            Path filePath = root.resolve(lessonId.toString()+getExtension(file.getOriginalFilename()) );
+            String extension = getExtension(file.getOriginalFilename());
+            if(!extension.equalsIgnoreCase(".mp4")){
+                throw new BadRequestException();
+            }
+            Path filePath = root.resolve(lessonId.toString()+extension );
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
+            if (e instanceof BadRequestException) {
+                throw new BadRequestException("File must have .mp4 extension");
+            }
             if (e instanceof FileAlreadyExistsException) {
-                throw new RuntimeException("A file of that name already exists.");
+                throw new BadRequestException("A file of that name already exists.");
+            }
+            if(e instanceof FileSizeLimitExceededException){
+                throw new BadRequestException("File size limit achieved (50MB)");
             }
             throw new RuntimeException(e.getMessage());
         }
