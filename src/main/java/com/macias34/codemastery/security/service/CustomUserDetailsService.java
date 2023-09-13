@@ -21,7 +21,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @Service
-public class CustomUserDetailService implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
 	private UserRepository userRepository;
 
