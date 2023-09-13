@@ -1,15 +1,20 @@
 package com.macias34.codemastery.course.service;
 
 import com.macias34.codemastery.course.dto.course.CourseDto;
+import com.macias34.codemastery.course.dto.course.CourseResponseDto;
 import com.macias34.codemastery.course.dto.course.CreateCourseDto;
 import com.macias34.codemastery.course.entity.CategoryEntity;
 import com.macias34.codemastery.course.entity.CourseEntity;
 import com.macias34.codemastery.course.mapper.CourseMapper;
+import com.macias34.codemastery.course.model.CourseFilter;
 import com.macias34.codemastery.course.repository.CategoryRepository;
 import com.macias34.codemastery.course.repository.CourseRepository;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
 import com.macias34.codemastery.util.DateTimeUtil;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -26,14 +31,22 @@ public class CourseService {
     private final CategoryRepository categoryRepository;
     private final CourseMapper courseMapper;
 
-    public List<CourseDto> getAllCourses(){
-        List<CourseEntity> courses = courseRepository.findAll();
+    public CourseResponseDto searchCourses(CourseFilter courseFilter, int page, int size){
+        Pageable paging = PageRequest.of(page, size);
+        Page<CourseEntity> coursesPage = this.courseRepository.searchCourseEntitiesByFilters(courseFilter,paging);
+        List<CourseEntity> courses = coursesPage.getContent();
 
         if(courses.isEmpty()){
             throw new ResourceNotFoundException("Courses not found");
         }
 
-        return courses.stream().map(courseMapper::fromEntityToDto).toList();
+        List<CourseDto> courseDtos = courses.stream().map(courseMapper::fromEntityToDto).toList();
+
+        return CourseResponseDto.builder().
+                currentPage(page)
+                .totalElements(coursesPage.getTotalElements())
+                .totalPages(coursesPage.getTotalPages())
+                .courses(courseDtos).build();
     }
 
     public CourseDto getCourseById(int id){
