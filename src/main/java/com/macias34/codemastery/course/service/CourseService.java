@@ -86,8 +86,4 @@ public class CourseService {
 
         return courseMapper.fromEntityToDto(courseEntity);
     }
-
-
-
-
 }

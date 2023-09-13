@@ -13,6 +13,7 @@ import com.macias34.codemastery.exception.ResourceNotFoundException;
 import com.macias34.codemastery.exception.StorageException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -63,10 +64,10 @@ public class LessonService {
         LessonEntity lesson = lessonRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Lesson not found"));
 
         try{
-            storageService.deleteByfileName(String.valueOf(lesson.getId())+".mp4");
+            storageService.deleteByfileName(lesson.getId() +".mp4");
             lessonRepository.deleteById(lesson.getId());
         }catch (Exception e){
-            throw new StorageException("Error with removing file occured");
+            throw new StorageException("Error with removing file occurred");
         }
 
         return lessonMapper.fromEntityToDto(lesson);
@@ -93,5 +94,13 @@ public class LessonService {
             throw new ResourceNotFoundException("Lessons not found");
         }
         return lessons.stream().map(lessonMapper::fromEntityToDto).toList();
+    }
+
+    public Resource getLessonFileById(int id) {
+        try{
+            return storageService.load(id + ".mp4");
+        }catch (Exception e){
+            throw new RuntimeException("Error with returning file for given lesson");
+        }
     }
 }

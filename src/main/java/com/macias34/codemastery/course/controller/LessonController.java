@@ -7,6 +7,8 @@ import com.macias34.codemastery.course.dto.lesson.LessonDto;
 import com.macias34.codemastery.course.dto.lesson.UpdateLessonDto;
 import com.macias34.codemastery.course.service.LessonService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,6 +37,18 @@ public class LessonController {
             @PathVariable int id
     ){
         return ResponseEntity.ok(lessonService.getLessonById(id));
+    }
+
+    @GetMapping("/file/{id}")
+    public ResponseEntity<Resource> getLessonFileById(
+            @PathVariable int id
+    ){
+        // TODO Check if user bought course
+        Resource resource = lessonService.getLessonFileById(id);
+        return ResponseEntity.ok()
+//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"") // Downloading file
+                .header(HttpHeaders.CONTENT_TYPE,"video/mp4") //Displaying file
+                .body(resource);
     }
 
     @GetMapping("/chapter/{id}")
