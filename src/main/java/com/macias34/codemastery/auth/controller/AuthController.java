@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.macias34.codemastery.auth.dto.AuthResponseDto;
 import com.macias34.codemastery.auth.dto.SignInDto;
 import com.macias34.codemastery.auth.dto.SignUpDto;
+import com.macias34.codemastery.exception.ResourceAlreadyExistsException;
+import com.macias34.codemastery.exception.ResourceNotFoundException;
 import com.macias34.codemastery.security.jwt.JwtGenerator;
 import com.macias34.codemastery.user.entity.UserEntity;
 import com.macias34.codemastery.user.entity.UserRole;
@@ -36,7 +38,13 @@ public class AuthController {
 	@PostMapping("/sign-up")
 	public ResponseEntity<String> signUp(@RequestBody SignUpDto signUpDto) {
 		if (userRepository.existsByUsername(signUpDto.getUsername())) {
-			return new ResponseEntity<String>("Username is taken.", HttpStatus.BAD_REQUEST);
+			throw new ResourceAlreadyExistsException(
+					"User with username " + signUpDto.getUsername() + " already exists.");
+		}
+
+		if (userRepository.existsByEmail(signUpDto.getEmail())) {
+			throw new ResourceAlreadyExistsException(
+					"User with username " + signUpDto.getEmail() + " already exists.");
 		}
 
 		UserEntity user = new UserEntity();
@@ -47,7 +55,7 @@ public class AuthController {
 
 		userRepository.save(user);
 
-		return new ResponseEntity<>("User signed up succesfully.", HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@PostMapping("/sign-in")
