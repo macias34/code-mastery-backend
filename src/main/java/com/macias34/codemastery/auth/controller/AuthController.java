@@ -30,6 +30,7 @@ public class AuthController {
 
 	@PostMapping("/sign-in")
 	public ResponseEntity<AuthResponseDto> signIn(@RequestBody SignInDto signInDto) {
+		authService.checkIfUserDoesntExist(signInDto);
 
 		String token = authService.generateJwt(signInDto);
 

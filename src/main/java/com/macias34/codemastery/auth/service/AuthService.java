@@ -1,6 +1,7 @@
 package com.macias34.codemastery.auth.service;
 
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Service;
 import com.macias34.codemastery.auth.dto.SignInDto;
 import com.macias34.codemastery.auth.dto.SignUpDto;
 import com.macias34.codemastery.exception.ResourceAlreadyExistsException;
+import com.macias34.codemastery.exception.ResourceNotFoundException;
+import com.macias34.codemastery.exception.WrongCredentialsException;
 import com.macias34.codemastery.security.jwt.JwtGenerator;
 import com.macias34.codemastery.user.entity.UserEntity;
 import com.macias34.codemastery.user.repository.UserRepository;
@@ -49,11 +52,23 @@ public class AuthService {
 		}
 	}
 
+	public void checkIfUserDoesntExist(SignInDto signInDto) throws ResourceNotFoundException {
+		if (!userRepository.existsByUsername(signInDto.getUsername())) {
+			throw new ResourceNotFoundException(
+					"User with username " + signInDto.getUsername() + " doesn't exist.");
+		}
+	}
+
 	public String generateJwt(SignInDto signInDto) {
-		Authentication authentication = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(signInDto.getUsername(), signInDto.getPassword()));
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		String token = jwtGenerator.generateToken(authentication);
+		String token = null;
+		try {
+			Authentication authentication = authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(signInDto.getUsername(), signInDto.getPassword()));
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+			token = jwtGenerator.generateToken(authentication);
+		} catch (BadCredentialsException e) {
+			throw new WrongCredentialsException("Username " + signInDto.getUsername() + " has a different password.");
+		}
 
 		return token;
 	}
