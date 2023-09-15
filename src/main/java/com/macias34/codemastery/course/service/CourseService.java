@@ -13,6 +13,7 @@ import com.macias34.codemastery.exception.BadRequestException;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
 import com.macias34.codemastery.exception.StorageException;
 import com.macias34.codemastery.util.DateTimeUtil;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -63,7 +64,12 @@ public class CourseService {
     public CourseDto deleteCourseById(int id){
         CourseEntity course = courseRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Course not found"));
 
-        courseRepository.deleteById(id);
+        try{
+            storageService.deleteByfileName(course.getId() + course.getAvatarFileExtension());
+            courseRepository.deleteById(id);
+        }catch (Exception e){
+            throw new StorageException("Error with removing file occurred");
+        }
 
         return courseMapper.fromEntityToDto(course);
     }
@@ -110,5 +116,52 @@ public class CourseService {
         }catch (Exception e){
             throw new RuntimeException("Error with returning file for given lesson");
         }
+    }
+
+    @Transactional
+    public CourseDto updateCourse(int id, CreateCourseDto dto, MultipartFile avatar) {
+        CourseEntity course = courseRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Course not found"));
+
+
+        Set<CategoryEntity> categories = new HashSet<>();
+
+        if(dto.getCategoriesIds() != null){
+            for (int categoryId: dto.getCategoriesIds()){
+                Optional<CategoryEntity> category = categoryRepository.findById(categoryId);
+                category.ifPresent(categories::add);
+            }
+            course.setCategories(categories);
+        }
+
+        if(dto.getPrice() != null){
+            course.setPrice(dto.getPrice());
+        }
+        if(dto.getDescription() != null){
+            course.setDescription(dto.getDescription());
+        }
+        if(dto.getName() != null){
+            course.setName(dto.getName());
+        }
+        if(dto.getInstructorName() != null){
+            course.setInstructorName(dto.getInstructorName());
+        }
+
+
+        try{
+            if(avatar != null){
+                String extension = storageService.getExtension(avatar.getOriginalFilename());
+                storageService.deleteByfileName(course.getId()+course.getAvatarFileExtension());
+                storageService.save(avatar,course.getId(),"image mimetype");
+                course.setAvatarFileExtension(extension);
+            }
+            courseRepository.save(course);
+        }catch (Exception e){
+            if(e instanceof BadRequestException){
+                throw e;
+            }
+            throw new StorageException("Error with saving file occurred");
+        }
+
+        return courseMapper.fromEntityToDto(course);
     }
 }

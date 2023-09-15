@@ -69,7 +69,7 @@ public class CourseController {
     public ResponseEntity<CourseDto> createCourse(
             @RequestParam("avatar") MultipartFile avatar,
             @RequestParam("name") String name,
-            @RequestParam("price") double price,
+            @RequestParam("price") Double price,
             @RequestParam("instructorName") String instructorName,
             @RequestParam("description") String description,
             @RequestParam("categoriesIds") Set<Integer> categoriesIds
@@ -77,6 +77,21 @@ public class CourseController {
     ){
         CreateCourseDto dto = new CreateCourseDto(name,price,instructorName,description,categoriesIds);
         return ResponseEntity.ok(courseService.createCourse(dto, avatar));
+    }
+
+    @RequestMapping(method = RequestMethod.PATCH, value = "/{id}",consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<CourseDto> updateCourse(
+            @RequestParam(value = "avatar",required = false) MultipartFile avatar,
+            @RequestParam(value ="name",required = false) String name,
+            @RequestParam(value ="price",required = false) Double price,
+            @RequestParam(value ="instructorName",required = false) String instructorName,
+            @RequestParam(value ="description",required = false) String description,
+            @RequestParam(value ="categoriesIds",required = false) Set<Integer> categoriesIds,
+            @PathVariable int id
+
+    ){
+        CreateCourseDto dto = new CreateCourseDto(name,price,instructorName,description,categoriesIds);
+        return ResponseEntity.ok(courseService.updateCourse(id,dto, avatar));
     }
 
 
@@ -92,6 +107,4 @@ public class CourseController {
                 .header(HttpHeaders.CONTENT_TYPE,mimeType)
                 .body(image);
     }
-    //TODO update course
-
 }
