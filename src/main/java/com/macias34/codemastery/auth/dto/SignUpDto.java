@@ -1,10 +1,14 @@
 package com.macias34.codemastery.auth.dto;
 
-import lombok.Data;
-
-@Data
-public class SignUpDto {
-	private String username;
+public class SignUpDto extends SignInDto {
 	private String email;
-	private String password;
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
 }
