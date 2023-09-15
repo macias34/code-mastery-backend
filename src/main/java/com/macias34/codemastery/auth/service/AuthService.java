@@ -59,7 +59,7 @@ public class AuthService {
 		}
 	}
 
-	public String generateJwt(SignInDto signInDto) {
+	public String generateJwt(SignInDto signInDto) throws BadCredentialsException {
 		String token = null;
 		try {
 			Authentication authentication = authenticationManager.authenticate(
