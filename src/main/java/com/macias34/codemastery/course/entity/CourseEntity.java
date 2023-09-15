@@ -36,6 +36,8 @@ public class CourseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
+    @Column(name = "avatar_file_extension")
+    private String avatarFileExtension;
     private double price;
     @Column(name = "instructor_name")
     private String instructorName;
@@ -60,11 +62,12 @@ public class CourseEntity {
     @OneToMany(mappedBy = "course")
     private List<OrderEntity> orders;
 
-    public CourseEntity(String name, double price, String instructorName, int participantsCount, String description) {
+    public CourseEntity(String name, double price, String instructorName, int participantsCount, String description,String avatarFileExtension) {
         this.name = name;
         this.price = price;
         this.instructorName = instructorName;
         this.participantsCount = participantsCount;
         this.description = description;
+        this.avatarFileExtension = avatarFileExtension;
     }
 }

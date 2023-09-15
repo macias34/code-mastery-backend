@@ -35,7 +35,7 @@ public class SecurityConfig {
 				.and()
 				.authorizeRequests()
 				.requestMatchers("/auth/**").permitAll()
-				.anyRequest().authenticated()
+				.anyRequest().permitAll()
 				.and().httpBasic();
 
 		http.addFilterBefore(jwtAuthenticationFilter(),

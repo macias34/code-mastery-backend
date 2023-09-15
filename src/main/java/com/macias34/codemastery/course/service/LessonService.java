@@ -36,7 +36,6 @@ public class LessonService {
         this.storageService = storageService;
     }
 
-    //TODO File upload
     @Transactional
     public LessonDto createLesson(CreateLessonDto dto, MultipartFile file){
         ChapterEntity chapter = chapterRepository.findById(dto.getChapterId()).orElseThrow(()-> new ResourceNotFoundException("Chapter not found"));
@@ -48,7 +47,7 @@ public class LessonService {
 
         try{
             lessonRepository.save(lesson);
-            storageService.save(file,lesson.getId());
+            storageService.save(file,lesson.getId(),".mp4");
             chapterRepository.save(chapter);
         }catch (Exception e){
             lessonRepository.deleteById(lesson.getId());

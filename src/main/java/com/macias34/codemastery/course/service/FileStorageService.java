@@ -19,28 +19,38 @@ import java.nio.file.StandardCopyOption;
 
 @Service
 public class FileStorageService {
-    private final Path root = Paths.get("src/main/resources/uploads");
+    private final Path videosRoot = Paths.get("src/main/resources/uploads");
+    private final Path avatarsRoot = Paths.get("src/main/resources/avatars");
 
     public void init() {
         try {
-            Files.createDirectories(root);
+            Files.createDirectories(videosRoot);
         } catch (IOException e) {
             throw new RuntimeException("Could not initialize folder for upload!");
         }
     }
 
-    public void save(MultipartFile file, Integer lessonId) {
+    public void save(MultipartFile file, Integer fileId, String expectedExtension) {
 
         try {
             String extension = getExtension(file.getOriginalFilename());
-            if(!extension.equalsIgnoreCase(".mp4")){
+
+            Path root = videosRoot;
+
+            Tika tika = new Tika();
+            String mimeType = tika.detect(file.getInputStream());
+
+            if(mimeType.startsWith("image/")){
+                root = avatarsRoot;
+            }else if(!extension.equalsIgnoreCase(expectedExtension)){
                 throw new BadRequestException();
             }
-            Path filePath = root.resolve(lessonId.toString()+extension );
+
+            Path filePath = root.resolve(fileId.toString()+extension );
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
             if (e instanceof BadRequestException) {
-                throw new BadRequestException("File must have .mp4 extension");
+                throw new BadRequestException(String.format("File must have %s extension",expectedExtension));
             }
             if (e instanceof FileAlreadyExistsException) {
                 throw new BadRequestException("A file of that name already exists.");
@@ -54,6 +64,8 @@ public class FileStorageService {
 
     public Resource load(String filename) {
         try {
+            Path root = getRootPath(filename);
+
             Path file = root.resolve(filename);
             Resource resource = new UrlResource(file.toUri());
 
@@ -68,6 +80,7 @@ public class FileStorageService {
     }
 
     public void deleteByfileName(String fileName) {
+        Path root = getRootPath(fileName);
         try{
             FileSystemUtils.deleteRecursively(root.resolve(fileName));
         }catch (Exception e){
@@ -75,7 +88,20 @@ public class FileStorageService {
         }
     }
 
-    private String getExtension(String fileName){
+    private Path getRootPath(String fileName){
+        Path root = videosRoot;
+
+        Tika tika = new Tika();
+        String mimeType = tika.detect(fileName);
+
+        if(mimeType.startsWith("image/")){
+            root = avatarsRoot;
+        }
+
+        return root;
+    }
+
+    public String getExtension(String fileName){
         return fileName.substring(fileName.lastIndexOf("."));
     }
 
