@@ -65,7 +65,6 @@ public class LessonController {
         return ResponseEntity.ok(lessonService.deleteLessonById(id));
     }
 
-    //TODO Handle file upload
     @RequestMapping(method = RequestMethod.POST, value = "/",consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<LessonDto> createLesson(
             @RequestParam("chapterId") int chapterId,

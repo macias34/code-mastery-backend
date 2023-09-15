@@ -4,11 +4,16 @@ import com.macias34.codemastery.course.dto.course.CourseDto;
 import com.macias34.codemastery.course.dto.course.CourseResponseDto;
 import com.macias34.codemastery.course.dto.course.CreateCourseDto;
 import com.macias34.codemastery.course.model.CourseFilter;
+import com.macias34.codemastery.course.repository.CourseRepository;
 import com.macias34.codemastery.course.service.CourseService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.apache.tika.Tika;
+import org.springframework.core.io.Resource;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,16 +21,20 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/course")
 @AllArgsConstructor
 public class CourseController {
     private CourseService courseService;
+    private CourseRepository courseRepository;
 
     @GetMapping("/")
     public ResponseEntity<CourseResponseDto> searchCourses(
@@ -56,11 +65,32 @@ public class CourseController {
         return ResponseEntity.ok(courseService.deleteCourseById(id));
     }
 
-    @PostMapping("/")
+    @RequestMapping(method = RequestMethod.POST, value = "",consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<CourseDto> createCourse(
-            @RequestBody CreateCourseDto dto
+            @RequestParam("avatar") MultipartFile avatar,
+            @RequestParam("name") String name,
+            @RequestParam("price") double price,
+            @RequestParam("instructorName") String instructorName,
+            @RequestParam("description") String description,
+            @RequestParam("categoriesIds") Set<Integer> categoriesIds
+
     ){
-        return ResponseEntity.ok(courseService.createCourse(dto));
+        CreateCourseDto dto = new CreateCourseDto(name,price,instructorName,description,categoriesIds);
+        return ResponseEntity.ok(courseService.createCourse(dto, avatar));
+    }
+
+
+    @GetMapping("/avatar/{id}")
+    public ResponseEntity<Resource> getCourseAvatarById(
+            @PathVariable int id
+    ){
+        Resource image = courseService.getCourseAvatarById(id);
+        Tika tika = new Tika();
+        String mimeType = tika.detect(image.getFilename());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE,mimeType)
+                .body(image);
     }
     //TODO update course
 
