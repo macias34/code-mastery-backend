@@ -16,6 +16,7 @@ import com.macias34.codemastery.exception.WrongCredentialsException;
 import com.macias34.codemastery.security.jwt.JwtGenerator;
 import com.macias34.codemastery.user.entity.UserEntity;
 import com.macias34.codemastery.user.repository.UserRepository;
+import com.macias34.codemastery.util.DtoValidator;
 
 import lombok.AllArgsConstructor;
 
@@ -29,6 +30,8 @@ public class AuthService {
 	private JwtGenerator jwtGenerator;
 
 	public void createUser(SignUpDto signUpDto) {
+		DtoValidator.validate(signUpDto);
+
 		checkIfUserExists(signUpDto);
 
 		UserEntity user = new UserEntity();
