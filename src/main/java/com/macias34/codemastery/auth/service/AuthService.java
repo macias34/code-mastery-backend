@@ -18,6 +18,7 @@ import com.macias34.codemastery.user.entity.UserEntity;
 import com.macias34.codemastery.user.repository.UserRepository;
 import com.macias34.codemastery.util.DtoValidator;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -34,18 +35,38 @@ public class AuthService {
 	private AuthenticationManager authenticationManager;
 	private JwtGenerator jwtGenerator;
 
+	public String authenticateAndGenerateJwt(SignInDto signInDto) throws BadCredentialsException {
+		Authentication authentication = authenticate(signInDto);
+		return jwtGenerator.generateToken(authentication);
+	}
+
+	private Authentication authenticate(SignInDto signInDto) {
+		try {
+			return authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(signInDto.getUsername(), signInDto.getPassword()));
+		} catch (BadCredentialsException e) {
+			throw new WrongCredentialsException(String.format(WRONG_CREDENTIALS_MESSAGE, signInDto.getUsername()));
+		}
+	}
+
+	@Transactional
 	public void createUser(SignUpDto signUpDto) {
 		DtoValidator.validate(signUpDto);
 
 		checkIfUserExists(signUpDto);
 
+		UserEntity user = createUserEntity(signUpDto);
+
+		userRepository.save(user);
+
+	}
+
+	private UserEntity createUserEntity(SignUpDto signUpDto) {
 		UserEntity user = new UserEntity();
 		user.setUsername(signUpDto.getUsername());
 		user.setEmail(signUpDto.getEmail());
 		user.setPassword(passwordEncoder.encode(signUpDto.getPassword()));
-
-		userRepository.save(user);
-
+		return user;
 	}
 
 	public void checkIfUserExists(SignUpDto signUpDto) throws ResourceAlreadyExistsException {
@@ -64,20 +85,6 @@ public class AuthService {
 		if (!userRepository.existsByUsername(signInDto.getUsername())) {
 			throw new ResourceNotFoundException(
 					String.format(USER_DOESNT_EXIST_MESSAGE, signInDto.getUsername()));
-		}
-	}
-
-	public String authenticateAndGenerateJwt(SignInDto signInDto) throws BadCredentialsException {
-		Authentication authentication = authenticate(signInDto);
-		return jwtGenerator.generateToken(authentication);
-	}
-
-	private Authentication authenticate(SignInDto signInDto) {
-		try {
-			return authenticationManager.authenticate(
-					new UsernamePasswordAuthenticationToken(signInDto.getUsername(), signInDto.getPassword()));
-		} catch (BadCredentialsException e) {
-			throw new WrongCredentialsException(String.format(WRONG_CREDENTIALS_MESSAGE, signInDto.getUsername()));
 		}
 	}
 
