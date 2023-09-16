@@ -2,11 +2,13 @@ package com.macias34.codemastery.informationPage.service;
 
 import com.macias34.codemastery.course.repository.CategoryRepository;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
+import com.macias34.codemastery.informationPage.dto.CreateInformationPageDto;
 import com.macias34.codemastery.informationPage.dto.InformationPageDto;
-import com.macias34.codemastery.informationPage.dto.InformationPageRequestDto;
+import com.macias34.codemastery.informationPage.dto.UpdateInformationPageDto;
 import com.macias34.codemastery.informationPage.entity.InformationPageEntity;
 import com.macias34.codemastery.informationPage.mapper.InformationPageMapper;
 import com.macias34.codemastery.informationPage.repository.InformationPageRepository;
+import com.macias34.codemastery.util.DtoValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,8 @@ public class InformationPageService {
     private final InformationPageRepository informationPageRepository;
     private final InformationPageMapper informationPageMapper;
 
-    public InformationPageDto createInformationPage(InformationPageRequestDto dto){
+    public InformationPageDto createInformationPage(CreateInformationPageDto dto){
+        DtoValidator.validate(dto);
         String slug = generateSlug(dto.getTitle());
         InformationPageEntity informationPage = new InformationPageEntity(dto.getTitle(),slug,dto.getContent());
         informationPageRepository.save(informationPage);
@@ -43,7 +46,9 @@ public class InformationPageService {
         return informationPages.stream().map(informationPageMapper::fromEntityToDto).toList();
     }
 
-    public InformationPageDto updateInformationPage(int id, InformationPageRequestDto dto){
+    public InformationPageDto updateInformationPage(int id, UpdateInformationPageDto dto){
+        DtoValidator.validate(dto);
+
         InformationPageEntity informationPage = informationPageRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Information page not found"));
 
         if(dto.getTitle()!=null){

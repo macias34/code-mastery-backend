@@ -1,4 +1,4 @@
-package com.macias34.codemastery.course.dto.property;
+package com.macias34.codemastery.informationPage.dto;
 
 import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
@@ -8,9 +8,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class UpdatePropertyDto {
+public class UpdateInformationPageDto {
     @Nullable
-    private String label;
+    private String title;
     @Nullable
-    private String value;
+    private String content;
 }

@@ -67,11 +67,13 @@ public class LessonController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/",consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<LessonDto> createLesson(
-            @RequestParam("chapterId") int chapterId,
-            @RequestParam("name") String name,
-            @RequestParam("file") MultipartFile file
+            @RequestParam("file") MultipartFile file,
+            // All RequestParam which are part of dto has required=false in order to get validated by DtoValidator
+            @RequestParam(value = "chapterId", required = false) int chapterId,
+            @RequestParam(value = "name", required = false) String name
     ){
-        return ResponseEntity.ok(lessonService.createLesson(new CreateLessonDto(name,chapterId),file));
+        CreateLessonDto dto = new CreateLessonDto(name,chapterId);
+        return ResponseEntity.ok(lessonService.createLesson(dto,file));
     }
 
     @PatchMapping("/{id}")

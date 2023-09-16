@@ -1,7 +1,8 @@
 package com.macias34.codemastery.informationPage.controller;
 
+import com.macias34.codemastery.informationPage.dto.CreateInformationPageDto;
 import com.macias34.codemastery.informationPage.dto.InformationPageDto;
-import com.macias34.codemastery.informationPage.dto.InformationPageRequestDto;
+import com.macias34.codemastery.informationPage.dto.UpdateInformationPageDto;
 import com.macias34.codemastery.informationPage.service.InformationPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -36,14 +37,14 @@ public class InformationPageController {
 
     @PostMapping
     public ResponseEntity<InformationPageDto> createInformationPage(
-            @RequestBody InformationPageRequestDto dto
+            @RequestBody CreateInformationPageDto dto
     ){
       return ResponseEntity.ok(informationPageService.createInformationPage(dto));
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<InformationPageDto> editInformationPage(
-            @RequestBody InformationPageRequestDto dto,
+            @RequestBody UpdateInformationPageDto dto,
             @PathVariable int id
     ){
         return ResponseEntity.ok(informationPageService.updateInformationPage(id,dto));

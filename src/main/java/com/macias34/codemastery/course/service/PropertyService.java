@@ -9,6 +9,7 @@ import com.macias34.codemastery.course.mapper.PropertyMapper;
 import com.macias34.codemastery.course.repository.CourseRepository;
 import com.macias34.codemastery.course.repository.PropertyRepository;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
+import com.macias34.codemastery.util.DtoValidator;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,8 @@ public class PropertyService {
 
     @Transactional
     public PropertyDto createProperty(CreatePropertyDto dto){
+        DtoValidator.validate(dto);
+
         CourseEntity course = courseRepository.findById(dto.getCourseId()).orElseThrow(()-> new ResourceNotFoundException("Course not found"));
 
         PropertyEntity property = new PropertyEntity(dto.getLabel(),dto.getValue(),course);
@@ -48,6 +51,8 @@ public class PropertyService {
 
     @Transactional
     public PropertyDto updateProperty(int id, UpdatePropertyDto dto){
+        DtoValidator.validate(dto);
+
         PropertyEntity property = propertyRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Property not found"));
 
         if(dto.getLabel() != null){

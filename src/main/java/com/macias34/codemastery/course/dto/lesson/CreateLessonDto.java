@@ -1,5 +1,6 @@
 package com.macias34.codemastery.course.dto.lesson;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,6 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class CreateLessonDto {
+    @NotNull
     private String name;
+    @NotNull
     private int chapterId;
 }

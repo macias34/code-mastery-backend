@@ -14,6 +14,7 @@ import com.macias34.codemastery.exception.BadRequestException;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
 import com.macias34.codemastery.exception.StorageException;
 import com.macias34.codemastery.util.DateTimeUtil;
+import com.macias34.codemastery.util.DtoValidator;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -63,6 +64,7 @@ public class CourseService {
     }
 
     public CourseDto deleteCourseById(int id){
+        // TODO WHEN DELETED COURSE ALSO DELETE ALL LESSON FILES
         CourseEntity course = courseRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Course not found"));
 
         try{
@@ -76,6 +78,8 @@ public class CourseService {
     }
 
     public CourseDto createCourse(CreateCourseDto dto, MultipartFile avatar){
+        DtoValidator.validate(dto);
+
         String extension = storageService.getExtension(avatar.getOriginalFilename());
 
         CourseEntity courseEntity = new CourseEntity(
@@ -121,6 +125,8 @@ public class CourseService {
 
     @Transactional
     public CourseDto updateCourse(int id, UpdateCourseDto dto, MultipartFile avatar) {
+        DtoValidator.validate(dto);
+
         CourseEntity course = courseRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Course not found"));
 
 

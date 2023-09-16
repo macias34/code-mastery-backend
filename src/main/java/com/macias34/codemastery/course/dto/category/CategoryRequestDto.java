@@ -1,5 +1,6 @@
 package com.macias34.codemastery.course.dto.category;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,5 +14,6 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 public class CategoryRequestDto {
+    @NotNull
     private String name;
 }

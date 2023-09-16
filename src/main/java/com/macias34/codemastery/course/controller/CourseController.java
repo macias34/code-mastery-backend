@@ -68,12 +68,13 @@ public class CourseController {
 
     @RequestMapping(method = RequestMethod.POST, value = "",consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<CourseDto> createCourse(
-            @RequestParam("avatar") MultipartFile avatar,
-            @RequestParam("name") String name,
-            @RequestParam("price") Double price,
-            @RequestParam("instructorName") String instructorName,
-            @RequestParam("description") String description,
-            @RequestParam("categoriesIds") Set<Integer> categoriesIds
+            @RequestParam(value ="avatar") MultipartFile avatar,
+            // All RequestParam which are part of dto has required=false in order to get validated by DtoValidator
+            @RequestParam(value ="name",required = false) String name,
+            @RequestParam(value = "price",required = false) Double price,
+            @RequestParam(value ="instructorName",required = false) String instructorName,
+            @RequestParam(value ="description",required = false) String description,
+            @RequestParam(value ="categoriesIds",required = false) Set<Integer> categoriesIds
 
     ){
         CreateCourseDto dto = new CreateCourseDto(name,price,instructorName,description,categoriesIds);

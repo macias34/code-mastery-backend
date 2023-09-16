@@ -9,6 +9,7 @@ import com.macias34.codemastery.course.mapper.ChapterMapper;
 import com.macias34.codemastery.course.repository.ChapterRepository;
 import com.macias34.codemastery.course.repository.CourseRepository;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
+import com.macias34.codemastery.util.DtoValidator;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,8 @@ public class ChapterService {
 
     @Transactional
     public ChapterDto createChapter(CreateChapterDto dto){
+        DtoValidator.validate(dto);
+
         CourseEntity course = courseRepository.findById(dto.getCourseId()).orElseThrow(()-> new ResourceNotFoundException("Course not found"));
         ChapterEntity chapter = new ChapterEntity(dto.getName(),course);
 
@@ -54,6 +57,7 @@ public class ChapterService {
     }
 
     public ChapterDto deleteChapterById(int id){
+        // TODO WHEN DELETED CHAPTER ALSO DELETE ALL LESSON FILES
         ChapterEntity chapter = chapterRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Chapter not found"));
 
         chapterRepository.deleteById(chapter.getId());
@@ -62,6 +66,8 @@ public class ChapterService {
     }
 
     public ChapterDto updateChapter(int id, UpdateChapterDto dto){
+        DtoValidator.validate(dto);
+
         ChapterEntity chapter = chapterRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Chapter not found"));
 
         chapter.setName(dto.getName());

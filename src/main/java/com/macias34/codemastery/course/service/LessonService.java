@@ -11,6 +11,7 @@ import com.macias34.codemastery.course.repository.LessonRepository;
 import com.macias34.codemastery.exception.BadRequestException;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
 import com.macias34.codemastery.exception.StorageException;
+import com.macias34.codemastery.util.DtoValidator;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -38,6 +39,8 @@ public class LessonService {
 
     @Transactional
     public LessonDto createLesson(CreateLessonDto dto, MultipartFile file){
+        DtoValidator.validate(dto);
+
         ChapterEntity chapter = chapterRepository.findById(dto.getChapterId()).orElseThrow(()-> new ResourceNotFoundException("Chapter not found"));
         LessonEntity lesson = new LessonEntity(dto.getName(),chapter);
 
@@ -73,6 +76,8 @@ public class LessonService {
     }
 
     public LessonDto updateLessonById(int id, UpdateLessonDto dto){
+        DtoValidator.validate(dto);
+
         LessonEntity lesson = lessonRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Lesson not found"));
 
         lesson.setName(dto.getName());

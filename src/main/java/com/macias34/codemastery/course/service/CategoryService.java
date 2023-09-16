@@ -6,6 +6,7 @@ import com.macias34.codemastery.course.entity.CategoryEntity;
 import com.macias34.codemastery.course.mapper.CategoryMapper;
 import com.macias34.codemastery.course.repository.CategoryRepository;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
+import com.macias34.codemastery.util.DtoValidator;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,8 @@ public class CategoryService {
     }
 
     public CategoryDto createCategory(CategoryRequestDto dto){
+        DtoValidator.validate(dto);
+
         CategoryEntity category = new CategoryEntity(dto.getName());
 
         categoryRepository.save(category);
@@ -33,6 +36,8 @@ public class CategoryService {
 
     @Transactional
     public CategoryDto updateDto(int id, CategoryRequestDto dto){
+        DtoValidator.validate(dto);
+
         CategoryEntity category = categoryRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Category not found"));
         category.setName(dto.getName());
 
