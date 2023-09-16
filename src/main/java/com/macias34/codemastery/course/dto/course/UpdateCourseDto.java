@@ -1,5 +1,6 @@
 package com.macias34.codemastery.course.dto.course;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,11 +12,15 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 public class UpdateCourseDto {
+    @Nullable
     private String name;
     @Min(0)
-    private double price;
+    @Nullable
+    private Double price;
+    @Nullable
     private String instructorName;
+    @Nullable
     private String description;
-
+    @Nullable
     private Set<Integer> categoriesIds;
 }

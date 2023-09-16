@@ -3,6 +3,7 @@ package com.macias34.codemastery.course.controller;
 import com.macias34.codemastery.course.dto.course.CourseDto;
 import com.macias34.codemastery.course.dto.course.CourseResponseDto;
 import com.macias34.codemastery.course.dto.course.CreateCourseDto;
+import com.macias34.codemastery.course.dto.course.UpdateCourseDto;
 import com.macias34.codemastery.course.model.CourseFilter;
 import com.macias34.codemastery.course.repository.CourseRepository;
 import com.macias34.codemastery.course.service.CourseService;
@@ -90,7 +91,7 @@ public class CourseController {
             @PathVariable int id
 
     ){
-        CreateCourseDto dto = new CreateCourseDto(name,price,instructorName,description,categoriesIds);
+        UpdateCourseDto dto = new UpdateCourseDto(name,price,instructorName,description,categoriesIds);
         return ResponseEntity.ok(courseService.updateCourse(id,dto, avatar));
     }
 

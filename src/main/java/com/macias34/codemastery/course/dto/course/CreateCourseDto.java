@@ -12,15 +12,10 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 public class CreateCourseDto {
-    @Nullable
     private String name;
     @Min(0)
-    @Nullable
     private Double price;
-    @Nullable
     private String instructorName;
-    @Nullable
     private String description;
-    @Nullable
     private Set<Integer> categoriesIds;
 }

@@ -3,6 +3,7 @@ package com.macias34.codemastery.course.service;
 import com.macias34.codemastery.course.dto.course.CourseDto;
 import com.macias34.codemastery.course.dto.course.CourseResponseDto;
 import com.macias34.codemastery.course.dto.course.CreateCourseDto;
+import com.macias34.codemastery.course.dto.course.UpdateCourseDto;
 import com.macias34.codemastery.course.entity.CategoryEntity;
 import com.macias34.codemastery.course.entity.CourseEntity;
 import com.macias34.codemastery.course.mapper.CourseMapper;
@@ -119,7 +120,7 @@ public class CourseService {
     }
 
     @Transactional
-    public CourseDto updateCourse(int id, CreateCourseDto dto, MultipartFile avatar) {
+    public CourseDto updateCourse(int id, UpdateCourseDto dto, MultipartFile avatar) {
         CourseEntity course = courseRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Course not found"));
 
 
