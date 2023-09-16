@@ -14,7 +14,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.macias34.codemastery.security.jwt.JwtAuthenticationFilter;
 import com.macias34.codemastery.security.jwt.JwtEntryPoint;
-import com.macias34.codemastery.security.service.CustomUserDetailService;
+import com.macias34.codemastery.security.service.CustomUserDetailsService;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -22,7 +23,7 @@ import lombok.AllArgsConstructor;
 @EnableWebSecurity
 public class SecurityConfig {
 
-	private CustomUserDetailService userDetailService;
+	private CustomUserDetailsService userDetailService;
 	private JwtEntryPoint authEntryPoint;
 
 	@Bean

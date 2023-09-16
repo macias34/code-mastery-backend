@@ -23,39 +23,35 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChapterController {
     private final ChapterService chapterService;
+
     @GetMapping("/{id}")
     public ResponseEntity<ChapterDto> getChapterById(
-            @PathVariable int id
-    ){
+            @PathVariable int id) {
         return ResponseEntity.ok(chapterService.getChapterById(id));
     }
 
     @GetMapping("/course/{id}")
     public ResponseEntity<List<ChapterDto>> getChaptersByCourseId(
-            @PathVariable int id
-    ){
+            @PathVariable int id) {
         return ResponseEntity.ok(chapterService.getChaptersByCourseId(id));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ChapterDto> deleteChapterById(
-            @PathVariable int id
-    ){
+            @PathVariable int id) {
         return ResponseEntity.ok(chapterService.deleteChapterById(id));
     }
 
     @PostMapping("/")
     public ResponseEntity<ChapterDto> createChapter(
-            @RequestBody CreateChapterDto dto
-    ){
+            @RequestBody CreateChapterDto dto) {
         return ResponseEntity.ok(chapterService.createChapter(dto));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ChapterDto> createChapter(
+    public ResponseEntity<ChapterDto> updateChapter(
             @RequestBody UpdateChapterDto dto,
-            @PathVariable int id
-    ){
-        return ResponseEntity.ok(chapterService.updateChapter(id,dto));
+            @PathVariable int id) {
+        return ResponseEntity.ok(chapterService.updateChapter(id, dto));
     }
 }

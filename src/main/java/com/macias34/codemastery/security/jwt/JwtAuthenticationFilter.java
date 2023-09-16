@@ -10,7 +10,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.macias34.codemastery.security.service.CustomUserDetailService;
+import com.macias34.codemastery.security.service.CustomUserDetailsService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,7 +22,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	@Autowired
 	private JwtGenerator tokenGenerator;
 	@Autowired
-	private CustomUserDetailService customUserDetailsService;
+	private CustomUserDetailsService customUserDetailsService;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request,
