@@ -46,7 +46,7 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.DELETE, "/information-page", "/lesson", "/property", "/chapter",
 						"/category", "/course")
 				.hasAuthority(UserRole.ADMIN.name())
-				.anyRequest().authenticated()
+				.anyRequest().permitAll()
 				.and().httpBasic();
 
 		http.addFilterBefore(jwtAuthenticationFilter(),
