@@ -53,6 +53,9 @@ public class CourseEntity {
     )
     private Set<CategoryEntity> categories = new HashSet<>();
 
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    private Set<PropertyEntity> properties = new HashSet<>();
+
     @ManyToMany(mappedBy = "courses")
     private Set<UserEntity> users = new HashSet<>();
 
