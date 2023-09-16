@@ -24,6 +24,11 @@ import lombok.AllArgsConstructor;
 @Service
 public class AuthService {
 
+	private static final String USER_EXISTS_MESSAGE = "User with username %s already exists.";
+	private static final String EMAIL_EXISTS_MESSAGE = "User with email %s already exists.";
+	private static final String USER_DOESNT_EXIST_MESSAGE = "User with username %s doesn't exist.";
+	private static final String WRONG_CREDENTIALS_MESSAGE = "Username %s has a different password.";
+
 	private UserRepository userRepository;
 	private PasswordEncoder passwordEncoder;
 	private AuthenticationManager authenticationManager;
@@ -46,34 +51,34 @@ public class AuthService {
 	public void checkIfUserExists(SignUpDto signUpDto) throws ResourceAlreadyExistsException {
 		if (userRepository.existsByUsername(signUpDto.getUsername())) {
 			throw new ResourceAlreadyExistsException(
-					"User with username " + signUpDto.getUsername() + " already exists.");
+					String.format(USER_EXISTS_MESSAGE, signUpDto.getUsername()));
 		}
 
 		if (userRepository.existsByEmail(signUpDto.getEmail())) {
 			throw new ResourceAlreadyExistsException(
-					"User with email " + signUpDto.getEmail() + " already exists.");
+					String.format(EMAIL_EXISTS_MESSAGE, signUpDto.getEmail()));
 		}
 	}
 
 	public void checkIfUserDoesntExist(SignInDto signInDto) throws ResourceNotFoundException {
 		if (!userRepository.existsByUsername(signInDto.getUsername())) {
 			throw new ResourceNotFoundException(
-					"User with username " + signInDto.getUsername() + " doesn't exist.");
+					String.format(USER_DOESNT_EXIST_MESSAGE, signInDto.getUsername()));
 		}
 	}
 
-	public String generateJwt(SignInDto signInDto) throws BadCredentialsException {
-		String token = null;
-		try {
-			Authentication authentication = authenticationManager.authenticate(
-					new UsernamePasswordAuthenticationToken(signInDto.getUsername(), signInDto.getPassword()));
-			SecurityContextHolder.getContext().setAuthentication(authentication);
-			token = jwtGenerator.generateToken(authentication);
-		} catch (BadCredentialsException e) {
-			throw new WrongCredentialsException("Username " + signInDto.getUsername() + " has a different password.");
-		}
+	public String authenticateAndGenerateJwt(SignInDto signInDto) throws BadCredentialsException {
+		Authentication authentication = authenticate(signInDto);
+		return jwtGenerator.generateToken(authentication);
+	}
 
-		return token;
+	private Authentication authenticate(SignInDto signInDto) {
+		try {
+			return authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(signInDto.getUsername(), signInDto.getPassword()));
+		} catch (BadCredentialsException e) {
+			throw new WrongCredentialsException(String.format(WRONG_CREDENTIALS_MESSAGE, signInDto.getUsername()));
+		}
 	}
 
 }

@@ -32,7 +32,7 @@ public class AuthController {
 	public ResponseEntity<AuthResponseDto> signIn(@RequestBody SignInDto signInDto) {
 		authService.checkIfUserDoesntExist(signInDto);
 
-		String token = authService.generateJwt(signInDto);
+		String token = authService.authenticateAndGenerateJwt(signInDto);
 
 		return new ResponseEntity<>(new AuthResponseDto(token), HttpStatus.OK);
 	}
