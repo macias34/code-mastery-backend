@@ -2,6 +2,7 @@ package com.macias34.codemastery.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,6 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.macias34.codemastery.security.jwt.JwtAuthenticationFilter;
 import com.macias34.codemastery.security.jwt.JwtEntryPoint;
 import com.macias34.codemastery.security.service.CustomUserDetailsService;
+import com.macias34.codemastery.user.entity.UserRole;
 
 import lombok.AllArgsConstructor;
 
@@ -35,7 +37,15 @@ public class SecurityConfig {
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				.and()
 				.authorizeRequests()
-				.requestMatchers("/auth/**").permitAll()
+				.requestMatchers(HttpMethod.POST, "/information-page", "/lesson", "/property", "/chapter", "/category",
+						"/course")
+				.hasAuthority(UserRole.ADMIN.name())
+				.requestMatchers(HttpMethod.PATCH, "/information-page", "/lesson", "/property", "/chapter", "/category",
+						"/course")
+				.hasAuthority(UserRole.ADMIN.name())
+				.requestMatchers(HttpMethod.DELETE, "/information-page", "/lesson", "/property", "/chapter",
+						"/category", "/course")
+				.hasAuthority(UserRole.ADMIN.name())
 				.anyRequest().authenticated()
 				.and().httpBasic();
 
