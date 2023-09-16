@@ -5,7 +5,9 @@ import com.macias34.codemastery.course.dto.course.CourseResponseDto;
 import com.macias34.codemastery.course.dto.course.CreateCourseDto;
 import com.macias34.codemastery.course.dto.course.UpdateCourseDto;
 import com.macias34.codemastery.course.entity.CategoryEntity;
+import com.macias34.codemastery.course.entity.ChapterEntity;
 import com.macias34.codemastery.course.entity.CourseEntity;
+import com.macias34.codemastery.course.entity.LessonEntity;
 import com.macias34.codemastery.course.mapper.CourseMapper;
 import com.macias34.codemastery.course.model.CourseFilter;
 import com.macias34.codemastery.course.repository.CategoryRepository;
@@ -63,12 +65,22 @@ public class CourseService {
         return courseMapper.fromEntityToDto(course);
     }
 
+    @Transactional
     public CourseDto deleteCourseById(int id){
-        // TODO WHEN DELETED COURSE ALSO DELETE ALL LESSON FILES
         CourseEntity course = courseRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Course not found"));
-
         try{
             storageService.deleteByfileName(course.getId() + course.getAvatarFileExtension());
+
+            for (ChapterEntity chapter: course.getChapters()){
+                for (LessonEntity lesson: chapter.getLessons()){
+                    try{
+                        storageService.deleteByfileName(lesson.getId() +".mp4");
+                    }catch (Exception e){
+                        throw new StorageException("Error with removing file occurred");
+                    }
+                }
+            }
+
             courseRepository.deleteById(id);
         }catch (Exception e){
             throw new StorageException("Error with removing file occurred");

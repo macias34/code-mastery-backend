@@ -5,10 +5,12 @@ import com.macias34.codemastery.course.dto.chapter.UpdateChapterDto;
 import com.macias34.codemastery.course.dto.chapter.CreateChapterDto;
 import com.macias34.codemastery.course.entity.ChapterEntity;
 import com.macias34.codemastery.course.entity.CourseEntity;
+import com.macias34.codemastery.course.entity.LessonEntity;
 import com.macias34.codemastery.course.mapper.ChapterMapper;
 import com.macias34.codemastery.course.repository.ChapterRepository;
 import com.macias34.codemastery.course.repository.CourseRepository;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
+import com.macias34.codemastery.exception.StorageException;
 import com.macias34.codemastery.util.DtoValidator;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -22,6 +24,7 @@ public class ChapterService {
     private final ChapterRepository chapterRepository;
     private final CourseRepository courseRepository;
     private final ChapterMapper chapterMapper;
+    private final FileStorageService storageService;
 
     @Transactional
     public ChapterDto createChapter(CreateChapterDto dto){
@@ -57,8 +60,15 @@ public class ChapterService {
     }
 
     public ChapterDto deleteChapterById(int id){
-        // TODO WHEN DELETED CHAPTER ALSO DELETE ALL LESSON FILES
         ChapterEntity chapter = chapterRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Chapter not found"));
+
+        for (LessonEntity lesson: chapter.getLessons()){
+            try{
+                storageService.deleteByfileName(lesson.getId() +".mp4");
+            }catch (Exception e){
+                throw new StorageException("Error with removing file occurred");
+            }
+        }
 
         chapterRepository.deleteById(chapter.getId());
 
