@@ -15,6 +15,7 @@ import com.macias34.codemastery.exception.ResourceNotFoundException;
 import com.macias34.codemastery.exception.WrongCredentialsException;
 import com.macias34.codemastery.security.jwt.JwtGenerator;
 import com.macias34.codemastery.user.entity.UserEntity;
+import com.macias34.codemastery.user.entity.UserRole;
 import com.macias34.codemastery.user.repository.UserRepository;
 import com.macias34.codemastery.util.DtoValidator;
 
@@ -66,6 +67,8 @@ public class AuthService {
 		user.setUsername(signUpDto.getUsername());
 		user.setEmail(signUpDto.getEmail());
 		user.setPassword(passwordEncoder.encode(signUpDto.getPassword()));
+		user.setRole(UserRole.USER);
+
 		return user;
 	}
 
