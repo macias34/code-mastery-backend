@@ -1,8 +1,11 @@
 package com.macias34.codemastery.order.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.macias34.codemastery.course.entity.CourseEntity;
 import com.macias34.codemastery.user.entity.UserEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,7 +22,7 @@ import org.apache.catalina.User;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "order")
+@Table(name = "order_")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,16 +32,17 @@ public class OrderEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private Timestamp createdAt;
     private OrderStatus status;
     private double price;
 
-    @ManyToOne
-    @JoinColumn(name = "courseId", referencedColumnName = "id")
+//    @JsonManagedReference
+    @ManyToOne(fetch= FetchType.LAZY)
+    @JoinColumn(name = "course_id", referencedColumnName = "id")
     private CourseEntity course;
 
-    @ManyToOne
-    @JoinColumn(name = "userId", referencedColumnName = "id")
+//    @JsonBackReference
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private UserEntity user;
 
 

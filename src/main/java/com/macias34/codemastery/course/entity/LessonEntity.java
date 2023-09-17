@@ -1,6 +1,7 @@
 package com.macias34.codemastery.course.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,7 +27,7 @@ public class LessonEntity {
     private int id;
     private String name;
 
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "chapter_id", referencedColumnName = "id")
     private ChapterEntity chapter;
 

@@ -6,9 +6,11 @@ import com.macias34.codemastery.user.entity.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring",uses = CourseMapper.class)
+@Mapper(componentModel = "spring",uses = {CourseMapper.class, PersonalDetailsMapper.class, InvoiceDetailsMapper.class})
 
 public interface UserMapper {
-    @Mapping(target = "courses.chapters", ignore = true) // todo figure out how to ignore chapters
+    @Mapping(target = "personalDetails", source = "personalDetails")
+    @Mapping(target = "invoiceDetails", source = "invoiceDetails")
+//    @Mapping(target = "password", ignore = true)
     UserDto fromEntityToDto(UserEntity user);
 }

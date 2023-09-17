@@ -1,6 +1,7 @@
 package com.macias34.codemastery.user.dto;
 
 import com.macias34.codemastery.course.dto.course.CourseDto;
+import com.macias34.codemastery.course.dto.course.UsersCourseDto;
 import com.macias34.codemastery.course.entity.CourseEntity;
 import com.macias34.codemastery.order.entity.OrderEntity;
 import com.macias34.codemastery.user.entity.InvoiceDetailsEntity;
@@ -8,9 +9,11 @@ import com.macias34.codemastery.user.entity.PersonalDetailsEntity;
 import com.macias34.codemastery.user.entity.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,15 +21,15 @@ import java.util.Set;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserDto {
     private int id;
     private String username;
     private String email;
     private Timestamp createdAt;
     private UserRole role;
-    private String password;
-    private List<OrderEntity> orders;
-    private PersonalDetailsEntity personalDetails;
-    private InvoiceDetailsEntity invoiceDetails;
-    private Set<CourseDto> courses = new HashSet<>();
+    private PersonalDetailsDto personalDetails;
+    private InvoiceDetailsDto invoiceDetails;
+    private Set<UsersCourseDto> courses = new HashSet<>();
+    private List<OrderEntity> orders = new ArrayList<>(); // TODO order dto
 }

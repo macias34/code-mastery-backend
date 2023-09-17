@@ -1,10 +1,12 @@
 package com.macias34.codemastery.course.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.macias34.codemastery.order.entity.OrderEntity;
 import com.macias34.codemastery.user.entity.UserEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -45,7 +47,7 @@ public class CourseEntity {
     private int participantsCount;
     private String description;
 
-    @ManyToMany
+    @ManyToMany(fetch= FetchType.LAZY)
     @JoinTable(
             name = "course_category",
             joinColumns = { @JoinColumn(name = "course_id") },
@@ -53,16 +55,18 @@ public class CourseEntity {
     )
     private Set<CategoryEntity> categories = new HashSet<>();
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch=FetchType.LAZY)
     private Set<PropertyEntity> properties = new HashSet<>();
 
-    @ManyToMany(mappedBy = "courses")
+//    @JsonBackReference
+    @ManyToMany(mappedBy = "courses", fetch=FetchType.LAZY)
     private Set<UserEntity> users = new HashSet<>();
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch=FetchType.LAZY)
     private List<ChapterEntity> chapters;
 
-    @OneToMany(mappedBy = "course")
+//    @JsonBackReference
+    @OneToMany(mappedBy = "course",fetch=FetchType.LAZY)
     private List<OrderEntity> orders;
 
     public CourseEntity(String name, double price, String instructorName, int participantsCount, String description,String avatarFileExtension) {
