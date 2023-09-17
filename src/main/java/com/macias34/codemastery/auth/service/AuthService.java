@@ -1,5 +1,13 @@
 package com.macias34.codemastery.auth.service;
 
+import com.macias34.codemastery.user.dto.InvoiceDetailsDto;
+import com.macias34.codemastery.user.dto.PersonalDetailsDto;
+import com.macias34.codemastery.user.entity.InvoiceDetailsEntity;
+import com.macias34.codemastery.user.entity.PersonalDetailsEntity;
+import com.macias34.codemastery.user.mapper.InvoiceDetailsMapper;
+import com.macias34.codemastery.user.mapper.PersonalDetailsMapper;
+import com.macias34.codemastery.user.repository.InvoiceDetailsRepository;
+import com.macias34.codemastery.user.repository.PersonalDetailsRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,9 +40,14 @@ public class AuthService {
 	private static final String WRONG_CREDENTIALS_MESSAGE = "Username %s has a different password.";
 
 	private UserRepository userRepository;
+
 	private PasswordEncoder passwordEncoder;
 	private AuthenticationManager authenticationManager;
 	private JwtGenerator jwtGenerator;
+	private InvoiceDetailsMapper invoiceDetailsMapper;
+	private PersonalDetailsMapper personalDetailsMapper;
+	private InvoiceDetailsRepository invoiceDetailsRepository;
+	private PersonalDetailsRepository personalDetailsRepository;
 
 	public String authenticateAndGenerateJwt(SignInDto signInDto) throws BadCredentialsException {
 		Authentication authentication = authenticate(signInDto);
@@ -52,12 +65,29 @@ public class AuthService {
 
 	@Transactional
 	public void createUser(SignUpDto signUpDto) {
+
+		if(signUpDto.isInvoiceDetailsSameAsPersonal()){
+			PersonalDetailsDto personalDetails = signUpDto.getPersonalDetails();
+			DtoValidator.validate(personalDetails);
+			InvoiceDetailsDto invoiceDetails = InvoiceDetailsDto.builder()
+					.firstName(personalDetails.getFirstName())
+					.lastName(personalDetails.getFirstName())
+					.postalCode(personalDetails.getPostalCode())
+					.street(personalDetails.getStreet())
+					.city(personalDetails.getCity())
+					.phoneNumber(personalDetails.getPhoneNumber()).build();
+			signUpDto.setInvoiceDetailsDto(invoiceDetails);
+		}
+
 		DtoValidator.validate(signUpDto);
+
 
 		checkIfUserExists(signUpDto);
 
 		UserEntity user = createUserEntity(signUpDto);
 
+		personalDetailsRepository.save(user.getPersonalDetails());
+		invoiceDetailsRepository.save(user.getInvoiceDetails());
 		userRepository.save(user);
 
 	}
@@ -68,6 +98,15 @@ public class AuthService {
 		user.setEmail(signUpDto.getEmail());
 		user.setPassword(passwordEncoder.encode(signUpDto.getPassword()));
 		user.setRole(UserRole.USER);
+
+		InvoiceDetailsDto invoiceDetailsDto = signUpDto.getInvoiceDetailsDto();
+		PersonalDetailsDto personalDetailsDto = signUpDto.getPersonalDetails();
+
+		InvoiceDetailsEntity invoiceDetails = invoiceDetailsMapper.fromDtoToEntity(invoiceDetailsDto);
+		PersonalDetailsEntity personalDetails = personalDetailsMapper.fromDtoToEntity(personalDetailsDto);
+
+		user.setInvoiceDetails(invoiceDetails);
+		user.setPersonalDetails(personalDetails);
 
 		return user;
 	}

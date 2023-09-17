@@ -1,12 +1,14 @@
 package com.macias34.codemastery.user.dto;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class CreateInvoiceDetailsDto {
+@Builder
+public class InvoiceDetailsDto {
     @NotNull
     private String firstName;
     @NotNull
@@ -19,8 +21,6 @@ public class CreateInvoiceDetailsDto {
     private String street;
     @NotNull
     private String phoneNumber;
-    @NotNull
     private String companyName;
-    @NotNull
     private String nip;
 }

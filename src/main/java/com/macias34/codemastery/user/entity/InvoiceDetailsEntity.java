@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "personal_details")
+@Table(name = "invoice_details")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -41,4 +41,15 @@ public class InvoiceDetailsEntity {
 
     @OneToOne(mappedBy = "invoiceDetails", fetch = FetchType.LAZY)
     private UserEntity user;
+
+    public InvoiceDetailsEntity(String firstName, String lastName, String postalCode, String city, String street, String phoneNumber, String companyName, String nip) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.postalCode = postalCode;
+        this.city = city;
+        this.street = street;
+        this.phoneNumber = phoneNumber;
+        this.companyName = companyName;
+        this.nip = nip;
+    }
 }

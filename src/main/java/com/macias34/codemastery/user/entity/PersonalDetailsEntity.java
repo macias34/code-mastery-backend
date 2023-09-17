@@ -39,4 +39,12 @@ public class PersonalDetailsEntity {
     @OneToOne(mappedBy = "personalDetails", fetch = FetchType.LAZY)
     private UserEntity user;
 
+    public PersonalDetailsEntity(String firstName, String lastName, String postalCode, String city, String street, String phoneNumber) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.postalCode = postalCode;
+        this.city = city;
+        this.street = street;
+        this.phoneNumber = phoneNumber;
+    }
 }
