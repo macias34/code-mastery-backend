@@ -29,7 +29,7 @@ public class AuthService {
 	private static final String USER_EXISTS_MESSAGE = "User with username %s already exists.";
 	private static final String EMAIL_EXISTS_MESSAGE = "User with email %s already exists.";
 	private static final String USER_DOESNT_EXIST_MESSAGE = "User with username %s doesn't exist.";
-	private static final String WRONG_CREDENTIALS_MESSAGE = "Username %s has a different password.";
+	private static final String WRONG_CREDENTIALS_MESSAGE = "User %s has a different password.";
 
 	private UserRepository userRepository;
 	private PasswordEncoder passwordEncoder;
