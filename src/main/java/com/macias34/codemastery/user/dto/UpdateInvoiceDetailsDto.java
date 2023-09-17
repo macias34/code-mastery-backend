@@ -1,11 +1,13 @@
 package com.macias34.codemastery.user.dto;
 
 import jakarta.annotation.Nullable;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 public class UpdateInvoiceDetailsDto {
     @Nullable
     private String firstName;

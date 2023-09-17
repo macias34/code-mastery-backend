@@ -26,6 +26,7 @@ public class UserDto {
     private int id;
     private String username;
     private String email;
+    private String note;
     private Timestamp createdAt;
     private UserRole role;
     private PersonalDetailsDto personalDetails;

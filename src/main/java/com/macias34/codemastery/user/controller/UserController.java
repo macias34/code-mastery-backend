@@ -2,18 +2,20 @@ package com.macias34.codemastery.user.controller;
 
 import java.util.List;
 
+import com.macias34.codemastery.user.dto.UpdateUserDto;
 import com.macias34.codemastery.user.dto.UserDto;
+import com.macias34.codemastery.user.entity.UserRole;
+import com.macias34.codemastery.user.model.UserFilter;
 import com.macias34.codemastery.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.macias34.codemastery.user.entity.UserEntity;
-import com.macias34.codemastery.user.repository.UserRepository;
-
-import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/users")
@@ -24,9 +26,29 @@ public class UserController {
 
 	// TODO all needed crud methods
 	@GetMapping("")
-	public ResponseEntity<List<UserDto>> getUsers() {
+	public ResponseEntity<List<UserDto>> getUsers(
+			@RequestParam(required = false) String username,
+			@RequestParam(required = false) String email,
+			@RequestParam(required = false) UserRole role
+	) {
 		// TODO Pagination and searching
-		return ResponseEntity.ok(userService.getAllUsers());
+		UserFilter userFilter = new UserFilter(username,email,role);
+		return ResponseEntity.ok(userService.getAllUsers(userFilter));
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<UserDto> getUserById(
+			@PathVariable int id
+	){
+		return ResponseEntity.ok(userService.getUserById(id));
+	}
+
+	@PatchMapping("/{id}")
+	public ResponseEntity<UserDto> updateUser(
+			@PathVariable int id,
+			@RequestBody UpdateUserDto dto
+	){
+		return ResponseEntity.ok(userService.updateUser(id,dto));
 	}
 
 }

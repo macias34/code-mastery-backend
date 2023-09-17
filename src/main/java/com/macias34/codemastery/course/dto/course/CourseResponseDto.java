@@ -10,8 +10,8 @@ import java.util.List;
 @Setter
 @Builder
 public class CourseResponseDto {
-    long totalElements;
-    int totalPages;
-    int currentPage;
-    List<CourseDto> courses;
+    private long totalElements;
+    private int totalPages;
+    private int currentPage;
+    private List<CourseDto> courses;
 }

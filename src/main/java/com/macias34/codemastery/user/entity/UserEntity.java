@@ -48,6 +48,7 @@ public class UserEntity {
 	@Enumerated(EnumType.STRING)
 	private UserRole role;
 	private String password;
+	private String note;
 
 //	@JsonManagedReference
 	@OneToMany(mappedBy = "user",fetch=FetchType.LAZY)
@@ -67,10 +68,11 @@ public class UserEntity {
 			@JoinColumn(name = "course_id") })
 	private Set<CourseEntity> courses = new HashSet<>();
 
-	public UserEntity(String username, String email, String password, Timestamp createdAt, UserRole role) {
+	public UserEntity(String username, String email, String password,String note, Timestamp createdAt, UserRole role) {
 		this.username = username;
 		this.email = email;
 		this.password = password;
+		this.note = note;
 		this.createdAt = createdAt;
 		this.role = role;
 	}
