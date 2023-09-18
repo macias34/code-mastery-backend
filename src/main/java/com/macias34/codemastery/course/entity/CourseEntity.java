@@ -66,7 +66,7 @@ public class CourseEntity {
     private List<ChapterEntity> chapters;
 
 //    @JsonBackReference
-    @OneToMany(mappedBy = "course",fetch=FetchType.LAZY)
+    @ManyToMany(fetch=FetchType.LAZY, mappedBy = "courses")
     private List<OrderEntity> orders;
 
     public CourseEntity(String name, double price, String instructorName, int participantsCount, String description,String avatarFileExtension) {

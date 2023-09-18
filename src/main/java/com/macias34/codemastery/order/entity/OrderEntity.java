@@ -10,6 +10,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -20,6 +22,7 @@ import lombok.Setter;
 import org.apache.catalina.User;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Table(name = "order_")
@@ -36,9 +39,13 @@ public class OrderEntity {
     private double price;
 
 //    @JsonManagedReference
-    @ManyToOne(fetch= FetchType.LAZY)
-    @JoinColumn(name = "course_id", referencedColumnName = "id")
-    private CourseEntity course;
+    @ManyToMany
+    @JoinTable(
+            name = "order_course",
+            joinColumns = { @JoinColumn(name = "order_id") },
+            inverseJoinColumns = { @JoinColumn(name = "course_id") }
+    )
+    private List<CourseEntity> courses;
 
 //    @JsonBackReference
     @ManyToOne(fetch=FetchType.LAZY)
