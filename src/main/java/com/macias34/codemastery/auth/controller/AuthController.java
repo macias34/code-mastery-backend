@@ -1,5 +1,6 @@
 package com.macias34.codemastery.auth.controller;
 
+import jakarta.mail.MessagingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -22,7 +23,7 @@ public class AuthController {
 	private AuthService authService;
 
 	@PostMapping("/sign-up")
-	public ResponseEntity<String> signUp(@RequestBody SignUpDto signUpDto) {
+	public ResponseEntity<String> signUp(@RequestBody SignUpDto signUpDto) throws MessagingException {
 		authService.createUser(signUpDto);
 
 		return new ResponseEntity<>(HttpStatus.OK);

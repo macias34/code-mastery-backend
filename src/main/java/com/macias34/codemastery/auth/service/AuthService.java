@@ -1,5 +1,6 @@
 package com.macias34.codemastery.auth.service;
 
+import com.macias34.codemastery.mail.service.MailService;
 import com.macias34.codemastery.user.dto.InvoiceDetailsDto;
 import com.macias34.codemastery.user.dto.PersonalDetailsDto;
 import com.macias34.codemastery.user.entity.InvoiceDetailsEntity;
@@ -8,6 +9,7 @@ import com.macias34.codemastery.user.mapper.InvoiceDetailsMapper;
 import com.macias34.codemastery.user.mapper.PersonalDetailsMapper;
 import com.macias34.codemastery.user.repository.InvoiceDetailsRepository;
 import com.macias34.codemastery.user.repository.PersonalDetailsRepository;
+import jakarta.mail.MessagingException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -49,6 +51,8 @@ public class AuthService {
 	private InvoiceDetailsRepository invoiceDetailsRepository;
 	private PersonalDetailsRepository personalDetailsRepository;
 
+	private MailService mailService;
+
 	public String authenticateAndGenerateJwt(SignInDto signInDto) throws BadCredentialsException {
 		Authentication authentication = authenticate(signInDto);
 		return jwtGenerator.generateToken(authentication);
@@ -64,7 +68,7 @@ public class AuthService {
 	}
 
 	@Transactional
-	public void createUser(SignUpDto signUpDto) {
+	public void createUser(SignUpDto signUpDto) throws MessagingException {
 
 		if(signUpDto.isInvoiceDetailsSameAsPersonal()){
 			PersonalDetailsDto personalDetails = signUpDto.getPersonalDetails();
@@ -86,6 +90,7 @@ public class AuthService {
 
 		UserEntity user = createUserEntity(signUpDto);
 
+		mailService.sendMail();
 		personalDetailsRepository.save(user.getPersonalDetails());
 		invoiceDetailsRepository.save(user.getInvoiceDetails());
 		userRepository.save(user);
