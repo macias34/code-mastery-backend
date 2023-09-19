@@ -3,15 +3,11 @@ package com.macias34.codemastery.mail.service;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
-import jakarta.mail.Multipart;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
 import jakarta.mail.Transport;
-import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
-import jakarta.mail.internet.MimeMultipart;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -24,44 +20,30 @@ public class MailService {
     @Value("${EMAIL_PASSWORD}")
     private String password;
 
-    public void sendMail() throws MessagingException {
-        System.out.println(username);
-        System.out.println(password);
-        Properties prop = new Properties();
-        prop.put("mail.smtp.auth", true);
-        prop.put("mail.smtp.starttls.enable", "true");
-        prop.put("mail.smtp.host", "smtp.mailtrap.io");
-        prop.put("mail.smtp.port", "25");
-        prop.put("mail.smtp.ssl.trust", "smtp.mailtrap.io");
+    public void sendMail(String title, String text, String recipient) {
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
 
-        Session session = Session.getInstance(prop, new Authenticator() {
-            @Override
+        Session session = Session.getInstance(props, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(username, password);
             }
         });
 
-        try{
+        try {
             Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress("from@gmail.com"));
-            message.setRecipients(
-                    Message.RecipientType.TO, InternetAddress.parse("to@gmail.com"));
-            message.setSubject("Mail Subject");
-
-            String msg = "This is my first email using JavaMailer";
-
-            MimeBodyPart mimeBodyPart = new MimeBodyPart();
-            mimeBodyPart.setContent(msg, "text/html; charset=utf-8");
-
-            Multipart multipart = new MimeMultipart();
-            multipart.addBodyPart(mimeBodyPart);
-
-            message.setContent(multipart);
+            message.setFrom(new InternetAddress(username));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient));
+            message.setSubject(title);
+            message.setText(text);
 
             Transport.send(message);
-        }catch (Exception e){
-            throw e;
-//            throw new RuntimeException("Cannot send mail");
+            System.out.println("Wiadomość została wysłana.");
+        } catch (MessagingException e) {
+            throw new RuntimeException("Błąd podczas wysyłania maila z potwierdzeniem");
         }
 
     }

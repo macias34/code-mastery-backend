@@ -90,7 +90,7 @@ public class AuthService {
 
 		UserEntity user = createUserEntity(signUpDto);
 
-		mailService.sendMail();
+		mailService.sendMail("Potwierz adres email", "Potwierdz maila psie", user.getEmail());
 		personalDetailsRepository.save(user.getPersonalDetails());
 		invoiceDetailsRepository.save(user.getInvoiceDetails());
 		userRepository.save(user);
