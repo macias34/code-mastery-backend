@@ -9,6 +9,7 @@ import com.macias34.codemastery.user.mapper.InvoiceDetailsMapper;
 import com.macias34.codemastery.user.mapper.PersonalDetailsMapper;
 import com.macias34.codemastery.user.repository.InvoiceDetailsRepository;
 import com.macias34.codemastery.user.repository.PersonalDetailsRepository;
+import com.macias34.codemastery.user.service.UserService;
 import jakarta.mail.MessagingException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -35,10 +36,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @Service
 public class AuthService {
-
-	private static final String USER_EXISTS_MESSAGE = "User with username %s already exists.";
-	private static final String EMAIL_EXISTS_MESSAGE = "User with email %s already exists.";
-	private static final String USER_DOESNT_EXIST_MESSAGE = "User with username %s doesn't exist.";
+	// todo think about moving sign up method to user service
 	private static final String WRONG_CREDENTIALS_MESSAGE = "Username %s has a different password.";
 
 	private UserRepository userRepository;
@@ -52,6 +50,7 @@ public class AuthService {
 	private PersonalDetailsRepository personalDetailsRepository;
 
 	private MailService mailService;
+	private UserService userService;
 
 	public String authenticateAndGenerateJwt(SignInDto signInDto) throws BadCredentialsException {
 		Authentication authentication = authenticate(signInDto);
@@ -86,7 +85,7 @@ public class AuthService {
 		DtoValidator.validate(signUpDto);
 
 
-		checkIfUserExists(signUpDto);
+		userService.checkIfUserExists(signUpDto);
 
 		UserEntity user = createUserEntity(signUpDto);
 
@@ -114,25 +113,6 @@ public class AuthService {
 		user.setPersonalDetails(personalDetails);
 
 		return user;
-	}
-
-	public void checkIfUserExists(SignUpDto signUpDto) throws ResourceAlreadyExistsException {
-		if (userRepository.existsByUsername(signUpDto.getUsername())) {
-			throw new ResourceAlreadyExistsException(
-					String.format(USER_EXISTS_MESSAGE, signUpDto.getUsername()));
-		}
-
-		if (userRepository.existsByEmail(signUpDto.getEmail())) {
-			throw new ResourceAlreadyExistsException(
-					String.format(EMAIL_EXISTS_MESSAGE, signUpDto.getEmail()));
-		}
-	}
-
-	public void checkIfUserDoesntExist(SignInDto signInDto) throws ResourceNotFoundException {
-		if (!userRepository.existsByUsername(signInDto.getUsername())) {
-			throw new ResourceNotFoundException(
-					String.format(USER_DOESNT_EXIST_MESSAGE, signInDto.getUsername()));
-		}
 	}
 
 }

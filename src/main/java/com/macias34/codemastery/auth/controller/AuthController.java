@@ -1,5 +1,6 @@
 package com.macias34.codemastery.auth.controller;
 
+import com.macias34.codemastery.user.service.UserService;
 import jakarta.mail.MessagingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import lombok.AllArgsConstructor;
 public class AuthController {
 
 	private AuthService authService;
+	private UserService userService;
 
 	@PostMapping("/sign-up")
 	public ResponseEntity<String> signUp(@RequestBody SignUpDto signUpDto) throws MessagingException {
@@ -31,7 +33,7 @@ public class AuthController {
 
 	@PostMapping("/sign-in")
 	public ResponseEntity<AuthResponseDto> signIn(@RequestBody SignInDto signInDto) {
-		authService.checkIfUserDoesntExist(signInDto);
+		userService.checkIfUserDoesntExist(signInDto);
 
 		String token = authService.authenticateAndGenerateJwt(signInDto);
 

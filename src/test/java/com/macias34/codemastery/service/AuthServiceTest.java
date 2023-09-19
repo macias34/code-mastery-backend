@@ -10,6 +10,7 @@ import com.macias34.codemastery.user.mapper.InvoiceDetailsMapper;
 import com.macias34.codemastery.user.mapper.PersonalDetailsMapper;
 import com.macias34.codemastery.user.repository.InvoiceDetailsRepository;
 import com.macias34.codemastery.user.repository.PersonalDetailsRepository;
+import com.macias34.codemastery.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -29,15 +30,13 @@ public class AuthServiceTest {
 		PersonalDetailsMapper personalDetailsMapper = mock(PersonalDetailsMapper.class);
 		InvoiceDetailsMapper invoiceDetailsMapper = mock(InvoiceDetailsMapper.class);
 		MailService mailService = mock(MailService.class);
+		UserService userService = mock(UserService.class);
 
 		when(userRepository.existsByUsername(anyString())).thenReturn(true);
 
-		SignUpDto signUpDto = new SignUpDto();
-		signUpDto.setUsername("username");
-		signUpDto.setEmail("email@mail.com");
-		signUpDto.setPassword("password");
+		SignUpDto signUpDto =  SignUpDto.builder().username("username").email("email@mail.com").password("password").build();
 
-		AuthService authService = new AuthService(userRepository, passwordEncoder, null, null,invoiceDetailsMapper,personalDetailsMapper,invoiceDetailsRepository,personalDetailsRepository,mailService);
+		AuthService authService = new AuthService(userRepository, passwordEncoder, null, null,invoiceDetailsMapper,personalDetailsMapper,invoiceDetailsRepository,personalDetailsRepository,mailService,userService);
 
 		assertThrows(ResourceAlreadyExistsException.class, () -> {
 			authService.createUser(signUpDto);

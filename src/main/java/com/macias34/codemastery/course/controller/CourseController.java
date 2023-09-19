@@ -7,6 +7,7 @@ import com.macias34.codemastery.course.dto.course.UpdateCourseDto;
 import com.macias34.codemastery.course.model.CourseFilter;
 import com.macias34.codemastery.course.repository.CourseRepository;
 import com.macias34.codemastery.course.service.CourseService;
+import com.macias34.codemastery.security.service.CustomUserDetailsService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.apache.tika.Tika;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,6 +37,7 @@ import java.util.Set;
 public class CourseController {
     private CourseService courseService;
     private CourseRepository courseRepository;
+    private CustomUserDetailsService customUserDetailsService;
 
     @GetMapping("/")
     public ResponseEntity<CourseResponseDto> searchCourses(
@@ -44,7 +47,10 @@ public class CourseController {
             @RequestParam(defaultValue = "0") Integer minParticipantsCount,
             @RequestParam(defaultValue = "0") Integer categoryId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestHeader(name="Authorization") String token
+            ) {
+        System.out.println(token);
         CourseFilter courseFilter = new CourseFilter(name, minPrice, maxPrice, minParticipantsCount, categoryId);
 
         return ResponseEntity.ok(courseService.searchCourses(courseFilter, page, size));

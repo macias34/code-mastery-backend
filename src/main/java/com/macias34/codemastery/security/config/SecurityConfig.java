@@ -51,6 +51,7 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.DELETE, "/information-page", "/lesson", "/property", "/chapter",
 						"/category", "/course")
 				.hasAuthority(UserRole.ADMIN.name())
+				.requestMatchers(HttpMethod.PATCH, "/user/{id}").authenticated()
 				.anyRequest().permitAll()
 				.and().httpBasic();
 

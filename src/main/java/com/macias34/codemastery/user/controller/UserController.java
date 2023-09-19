@@ -9,6 +9,8 @@ import com.macias34.codemastery.user.model.UserFilter;
 import com.macias34.codemastery.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -31,7 +33,6 @@ public class UserController {
 			@RequestParam(required = false) String email,
 			@RequestParam(required = false) UserRole role
 	) {
-		// TODO Pagination and searching
 		UserFilter userFilter = new UserFilter(username,email,role);
 		return ResponseEntity.ok(userService.getAllUsers(userFilter));
 	}
@@ -48,7 +49,12 @@ public class UserController {
 			@PathVariable int id,
 			@RequestBody UpdateUserDto dto
 	){
-		return ResponseEntity.ok(userService.updateUser(id,dto));
+		// todo check if someone has username or email
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		String loggedUserUserName = authentication.getName();
+
+		return ResponseEntity.ok(userService.updateUser(id,dto, loggedUserUserName));
 	}
 
 }
