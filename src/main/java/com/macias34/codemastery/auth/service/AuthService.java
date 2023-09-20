@@ -35,7 +35,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @Service
-public class AuthService {
+public class AuthService { 
 	// todo think about moving sign up method to user service
 	private static final String WRONG_CREDENTIALS_MESSAGE = "Username %s has a different password.";
 
