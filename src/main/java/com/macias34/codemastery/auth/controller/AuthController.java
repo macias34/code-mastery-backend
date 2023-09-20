@@ -1,5 +1,6 @@
 package com.macias34.codemastery.auth.controller;
 
+import com.macias34.codemastery.user.dto.UserDto;
 import com.macias34.codemastery.user.service.UserService;
 import jakarta.mail.MessagingException;
 import org.springframework.http.HttpStatus;
@@ -33,10 +34,10 @@ public class AuthController {
 
 	@PostMapping("/sign-in")
 	public ResponseEntity<AuthResponseDto> signIn(@RequestBody SignInDto signInDto) {
-		userService.checkIfUserDoesntExist(signInDto);
 
+		UserDto userDto = userService.getUserByUsername(signInDto.getUsername());
 		String token = authService.authenticateAndGenerateJwt(signInDto);
 
-		return new ResponseEntity<>(new AuthResponseDto(token), HttpStatus.OK);
+		return new ResponseEntity<>(new AuthResponseDto(token, userDto), HttpStatus.OK);
 	}
 }
