@@ -28,5 +28,5 @@ public class UserDto {
     private PersonalDetailsDto personalDetails;
     private InvoiceDetailsDto invoiceDetails;
     private Set<CourseDto> courses = new HashSet<>();
-    private List<OrderEntity> orders = new ArrayList<>(); // TODO order dto
+    // private List<OrderEntity> orders = new ArrayList<>(); // TODO order dto
 }
