@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.macias34.codemastery.auth.dto.AuthResponseDto;
+import com.macias34.codemastery.auth.dto.SignInResponse;
 import com.macias34.codemastery.auth.dto.SignInDto;
 import com.macias34.codemastery.auth.dto.SignUpDto;
 import com.macias34.codemastery.auth.service.AuthService;
@@ -33,11 +33,11 @@ public class AuthController {
 	}
 
 	@PostMapping("/sign-in")
-	public ResponseEntity<AuthResponseDto> signIn(@RequestBody SignInDto signInDto) {
+	public ResponseEntity<SignInResponse> signIn(@RequestBody SignInDto signInDto) {
 
 		UserDto userDto = userService.getUserByUsername(signInDto.getUsername());
 		String token = authService.authenticateAndGenerateJwt(signInDto);
 
-		return new ResponseEntity<>(new AuthResponseDto(token, userDto), HttpStatus.OK);
+		return new ResponseEntity<>(new SignInResponse(token, userDto), HttpStatus.OK);
 	}
 }
