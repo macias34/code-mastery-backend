@@ -31,30 +31,36 @@ public class UserController {
 	public ResponseEntity<List<UserDto>> getUsers(
 			@RequestParam(required = false) String username,
 			@RequestParam(required = false) String email,
-			@RequestParam(required = false) UserRole role
-	) {
-		UserFilter userFilter = new UserFilter(username,email,role);
+			@RequestParam(required = false) UserRole role) {
+		UserFilter userFilter = new UserFilter(username, email, role);
 		return ResponseEntity.ok(userService.getAllUsers(userFilter));
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<UserDto> getUserById(
-			@PathVariable int id
-	){
+			@PathVariable int id) {
 		return ResponseEntity.ok(userService.getUserById(id));
+	}
+
+	@GetMapping("/me")
+	public ResponseEntity<UserDto> getCurrentUserDto() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		UserDto userDto = userService.getUserByUsername(authentication.getName());
+
+		return ResponseEntity.ok(userDto);
 	}
 
 	@PatchMapping("/{id}")
 	public ResponseEntity<UserDto> updateUser(
 			@PathVariable int id,
-			@RequestBody UpdateUserDto dto
-	){
+			@RequestBody UpdateUserDto dto) {
 		// todo check if someone has username or email
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 		String loggedUserUserName = authentication.getName();
 
-		return ResponseEntity.ok(userService.updateUser(id,dto, loggedUserUserName));
+		return ResponseEntity.ok(userService.updateUser(id, dto, loggedUserUserName));
 	}
 
 }
