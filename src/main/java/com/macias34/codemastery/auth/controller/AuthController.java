@@ -34,10 +34,10 @@ public class AuthController {
 
 	@PostMapping("/sign-in")
 	public ResponseEntity<SignInResponse> signIn(@RequestBody SignInDto signInDto) {
+		userService.checkIfUserDoesntExist(signInDto);
 
-		UserDto userDto = userService.getUserByUsername(signInDto.getUsername());
 		String token = authService.authenticateAndGenerateJwt(signInDto);
 
-		return new ResponseEntity<>(new SignInResponse(token, userDto), HttpStatus.OK);
+		return new ResponseEntity<>(new SignInResponse(token), HttpStatus.OK);
 	}
 }
