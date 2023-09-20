@@ -47,10 +47,8 @@ public class CourseController {
             @RequestParam(defaultValue = "0") Integer minParticipantsCount,
             @RequestParam(defaultValue = "0") Integer categoryId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestHeader(name="Authorization") String token
-            ) {
-        System.out.println(token);
+            @RequestParam(defaultValue = "10") int size
+    ) {
         CourseFilter courseFilter = new CourseFilter(name, minPrice, maxPrice, minParticipantsCount, categoryId);
 
         return ResponseEntity.ok(courseService.searchCourses(courseFilter, page, size));
