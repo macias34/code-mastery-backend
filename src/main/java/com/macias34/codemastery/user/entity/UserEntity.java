@@ -24,6 +24,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.criteria.Order;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -51,6 +52,7 @@ public class UserEntity {
 	private String password;
 	private String note;
 
+	@Getter(AccessLevel.NONE)
 	@Column(name = "has_confirmed_email")
 	private boolean hasConfirmedEmail;
 
@@ -80,6 +82,10 @@ public class UserEntity {
 		this.createdAt = createdAt;
 		this.role = role;
 		this.hasConfirmedEmail = false;
+	}
+
+	public boolean hasConfirmedEmail() {
+		return hasConfirmedEmail;
 	}
 
 }

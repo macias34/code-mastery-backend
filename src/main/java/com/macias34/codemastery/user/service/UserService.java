@@ -2,6 +2,7 @@ package com.macias34.codemastery.user.service;
 
 import com.macias34.codemastery.auth.dto.SignInDto;
 import com.macias34.codemastery.auth.dto.SignUpDto;
+import com.macias34.codemastery.exception.EmailNotConfirmedException;
 import com.macias34.codemastery.exception.NoPermissionException;
 import com.macias34.codemastery.exception.ResourceAlreadyExistsException;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
@@ -39,10 +40,11 @@ import java.util.function.Predicate;
 @AllArgsConstructor
 public class UserService {
 
-    private static final String USER_EXISTS_MESSAGE = "User with username %s already exists.";
+    private static final String USER_EXISTS_MESSAGE = "User %s already exists.";
     private static final String EMAIL_EXISTS_MESSAGE = "User with email %s already exists.";
-    private static final String USER_DOESNT_EXIST_MESSAGE = "User with username %s doesn't exist.";
+    private static final String USER_DOESNT_EXIST_MESSAGE = "User %s doesn't exist.";
     private static final String CONFIRMATION_TOKEN_DOESNT_EXIST_MESSAGE = "Confirmation token %s doesn't exist.";
+    private static final String USER_NOT_CONFIRMED_EMAIL_MESSAGE = "User %s hasn't confirmed email.";
 
     private UserRepository userRepository;
     private InvoiceDetailsRepository invoiceDetailsRepository;
@@ -177,6 +179,14 @@ public class UserService {
         if (!userRepository.existsByUsername(signInDto.getUsername())) {
             throw new ResourceNotFoundException(
                     String.format(USER_DOESNT_EXIST_MESSAGE, signInDto.getUsername()));
+        }
+    }
+
+    public void checkIfUserHasConfirmedEmail(SignInDto signInDto) {
+        boolean hasConfirmedEmail = userRepository.findByUsername(signInDto.getUsername()).get().hasConfirmedEmail();
+        if (!hasConfirmedEmail) {
+            throw new EmailNotConfirmedException(
+                    String.format(USER_NOT_CONFIRMED_EMAIL_MESSAGE, signInDto.getUsername()));
         }
     }
 
