@@ -11,6 +11,7 @@ import com.macias34.codemastery.user.dto.UpdateInvoiceDetailsDto;
 import com.macias34.codemastery.user.dto.UpdatePersonalDetailsDto;
 import com.macias34.codemastery.user.dto.UpdateUserDto;
 import com.macias34.codemastery.user.dto.UserDto;
+import com.macias34.codemastery.user.dto.UserResponseDto;
 import com.macias34.codemastery.user.entity.InvoiceDetailsEntity;
 import com.macias34.codemastery.user.entity.PersonalDetailsEntity;
 import com.macias34.codemastery.user.entity.UserEntity;
@@ -19,12 +20,17 @@ import com.macias34.codemastery.user.mapper.InvoiceDetailsMapper;
 import com.macias34.codemastery.user.mapper.PersonalDetailsMapper;
 import com.macias34.codemastery.user.mapper.UserMapper;
 import com.macias34.codemastery.user.model.UserFilter;
+import com.macias34.codemastery.user.model.UserSpecification;
 import com.macias34.codemastery.user.repository.InvoiceDetailsRepository;
 import com.macias34.codemastery.user.repository.PersonalDetailsRepository;
 import com.macias34.codemastery.user.repository.UserRepository;
 import com.macias34.codemastery.util.DtoValidator;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,24 +56,19 @@ public class UserService {
     private PersonalDetailsService personalDetailsService;
     private InvoiceDetailsService invoiceDetailsService;
 
-    public List<UserDto> getAllUsers(UserFilter userFilter){
-        List<UserEntity> userEntities = userRepository.findAll();
+    public UserResponseDto getAllUsers(UserFilter userFilter, int page, int size){
+        Specification<UserEntity> spec = UserSpecification.withFilters(userFilter);
 
-        Predicate<UserEntity> conditions = e -> true;
+        Pageable paging = PageRequest.of(page, size);
+        Page<UserEntity> usersPage = userRepository.findAll(spec,paging);
 
-        if(userFilter.getRole() != null){
-            conditions = conditions.and(u -> u.getRole() == userFilter.getRole());
-        }
+        List<UserDto> userDtos = usersPage.stream().map(userMapper::fromEntityToDto).toList();
 
-        if(userFilter.getUsername() != null){
-            conditions = conditions.and(u -> u.getUsername().toLowerCase().contains(userFilter.getUsername().toLowerCase()));
-        }
-
-        if(userFilter.getEmail() != null){
-            conditions = conditions.and(u -> u.getEmail().toLowerCase().contains(userFilter.getEmail().toLowerCase()));
-        }
-
-        return userEntities.stream().filter(conditions).map(userMapper::fromEntityToDto).toList();
+        return  UserResponseDto.builder()
+                .users(userDtos)
+                .totalElements(usersPage.getTotalElements())
+                .totalPages(usersPage.getTotalPages())
+                .build();
     }
 
     public UserDto getUserById(int id) {

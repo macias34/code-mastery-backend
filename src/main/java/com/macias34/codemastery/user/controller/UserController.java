@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.macias34.codemastery.user.dto.UpdateUserDto;
 import com.macias34.codemastery.user.dto.UserDto;
+import com.macias34.codemastery.user.dto.UserResponseDto;
 import com.macias34.codemastery.user.entity.UserRole;
 import com.macias34.codemastery.user.model.UserFilter;
 import com.macias34.codemastery.user.service.UserService;
@@ -28,13 +29,15 @@ public class UserController {
 
 	// TODO all needed crud methods
 	@GetMapping("")
-	public ResponseEntity<List<UserDto>> getUsers(
+	public ResponseEntity<UserResponseDto> getUsers(
 			@RequestParam(required = false) String username,
 			@RequestParam(required = false) String email,
-			@RequestParam(required = false) UserRole role
+			@RequestParam(required = false) UserRole role,
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size
 	) {
 		UserFilter userFilter = new UserFilter(username,email,role);
-		return ResponseEntity.ok(userService.getAllUsers(userFilter));
+		return ResponseEntity.ok(userService.getAllUsers(userFilter,page,size));
 	}
 
 	@GetMapping("/{id}")
