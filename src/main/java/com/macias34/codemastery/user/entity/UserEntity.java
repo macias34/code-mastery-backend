@@ -31,6 +31,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import jakarta.persistence.GenerationType;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "user_")
@@ -45,7 +47,6 @@ public class UserEntity {
 	private int id;
 	private String username;
 	private String email;
-	private Timestamp createdAt;
 
 	@Enumerated(EnumType.STRING)
 	private UserRole role;
@@ -67,6 +68,15 @@ public class UserEntity {
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "invoice_details_id", referencedColumnName = "id")
 	private InvoiceDetailsEntity invoiceDetails;
+
+	// @JsonManagedReference
+	@ManyToMany(fetch = FetchType.LAZY)
+	@Column(name = "created_at")
+	@CreationTimestamp
+	private Timestamp createdAt;
+	@Column(name = "updated_at")
+	@UpdateTimestamp
+	private Timestamp updatedAt;
 
 	// @JsonManagedReference
 	@ManyToMany(fetch = FetchType.LAZY)

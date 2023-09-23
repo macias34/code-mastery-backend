@@ -6,6 +6,7 @@ import com.macias34.codemastery.course.entity.LessonEntity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Getter
@@ -13,6 +14,8 @@ import java.util.List;
 public class ChapterDto {
     private int id;
     private String name;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
     private List<LessonDto> lessons;
 
     private int courseId;

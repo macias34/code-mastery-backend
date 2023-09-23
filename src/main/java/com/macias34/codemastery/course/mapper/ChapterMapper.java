@@ -8,5 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring",uses = LessonMapper.class)
 public interface ChapterMapper {
     @Mapping(target = "courseId", source = "course.id")
+    @Mapping(target = "createdAt", source = "createdAt")
+    @Mapping(target = "updatedAt", source = "updatedAt")
     ChapterDto fromEntityToDto(ChapterEntity chapterEntity);
 }

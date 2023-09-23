@@ -1,5 +1,6 @@
 package com.macias34.codemastery.course.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -13,6 +14,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "lesson")
@@ -30,6 +35,13 @@ public class LessonEntity {
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "chapter_id", referencedColumnName = "id")
     private ChapterEntity chapter;
+
+    @Column(name = "created_at")
+    @CreationTimestamp
+    private Timestamp createdAt;
+    @Column(name = "updated_at")
+    @UpdateTimestamp
+    private Timestamp updatedAt;
 
     public LessonEntity(String name, ChapterEntity chapter){
         this.name = name;

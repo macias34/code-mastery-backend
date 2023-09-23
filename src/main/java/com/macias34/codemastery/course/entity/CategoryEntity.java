@@ -13,7 +13,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,6 +35,13 @@ public class CategoryEntity {
 
     @ManyToMany(mappedBy = "categories",fetch= FetchType.LAZY)
     private Set<CourseEntity> courses = new HashSet<>();
+
+    @Column(name = "created_at")
+    @CreationTimestamp
+    private Timestamp createdAt;
+    @Column(name = "updated_at")
+    @UpdateTimestamp
+    private Timestamp updatedAt;
 
     public CategoryEntity(String name){
         this.name = name;
