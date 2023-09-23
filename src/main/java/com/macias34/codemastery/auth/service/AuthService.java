@@ -3,10 +3,12 @@ package com.macias34.codemastery.auth.service;
 import com.macias34.codemastery.mail.service.MailService;
 import com.macias34.codemastery.user.dto.InvoiceDetailsDto;
 import com.macias34.codemastery.user.dto.PersonalDetailsDto;
+import com.macias34.codemastery.user.entity.ConfirmationToken;
 import com.macias34.codemastery.user.entity.InvoiceDetailsEntity;
 import com.macias34.codemastery.user.entity.PersonalDetailsEntity;
 import com.macias34.codemastery.user.mapper.InvoiceDetailsMapper;
 import com.macias34.codemastery.user.mapper.PersonalDetailsMapper;
+import com.macias34.codemastery.user.repository.ConfirmationTokenRepository;
 import com.macias34.codemastery.user.repository.InvoiceDetailsRepository;
 import com.macias34.codemastery.user.repository.PersonalDetailsRepository;
 import com.macias34.codemastery.user.service.UserService;
@@ -30,12 +32,13 @@ import com.macias34.codemastery.user.entity.UserRole;
 import com.macias34.codemastery.user.repository.UserRepository;
 import com.macias34.codemastery.util.DtoValidator;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @Service
-public class AuthService { 
+public class AuthService {
 	// todo think about moving sign up method to user service
 	private static final String WRONG_CREDENTIALS_MESSAGE = "Username %s has a different password.";
 
@@ -48,6 +51,7 @@ public class AuthService {
 	private PersonalDetailsMapper personalDetailsMapper;
 	private InvoiceDetailsRepository invoiceDetailsRepository;
 	private PersonalDetailsRepository personalDetailsRepository;
+	private ConfirmationTokenRepository confirmationTokenRepository;
 
 	private MailService mailService;
 	private UserService userService;
@@ -69,7 +73,7 @@ public class AuthService {
 	@Transactional
 	public void createUser(SignUpDto signUpDto) throws MessagingException {
 
-		if(signUpDto.isInvoiceDetailsSameAsPersonal()){
+		if (signUpDto.isInvoiceDetailsSameAsPersonal()) {
 			PersonalDetailsDto personalDetails = signUpDto.getPersonalDetails();
 			DtoValidator.validate(personalDetails);
 			InvoiceDetailsDto invoiceDetails = InvoiceDetailsDto.builder()
@@ -84,16 +88,23 @@ public class AuthService {
 
 		DtoValidator.validate(signUpDto);
 
-
 		userService.checkIfUserExists(signUpDto);
 
 		UserEntity user = createUserEntity(signUpDto);
+		ConfirmationToken confirmationToken = new ConfirmationToken(user.getEmail());
 
-		mailService.sendMail("Potwierz adres email", "Potwierdz maila psie", user.getEmail());
+		String hostUrl = Dotenv.load().get("HOST_URL");
+		String tokenConfirmationUrl = hostUrl + "/api/user/confirm-email?token="
+				+ confirmationToken.getConfirmationToken();
+
+		String mailMessage = "Click this link to confirm your email: " + tokenConfirmationUrl;
+
+		mailService.sendMail("Confirm your email", mailMessage, user.getEmail());
+
+		confirmationTokenRepository.save(confirmationToken);
 		personalDetailsRepository.save(user.getPersonalDetails());
 		invoiceDetailsRepository.save(user.getInvoiceDetails());
 		userRepository.save(user);
-
 	}
 
 	private UserEntity createUserEntity(SignUpDto signUpDto) {

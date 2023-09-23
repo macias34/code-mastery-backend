@@ -11,6 +11,7 @@ import com.macias34.codemastery.user.dto.UpdateInvoiceDetailsDto;
 import com.macias34.codemastery.user.dto.UpdatePersonalDetailsDto;
 import com.macias34.codemastery.user.dto.UpdateUserDto;
 import com.macias34.codemastery.user.dto.UserDto;
+import com.macias34.codemastery.user.entity.ConfirmationToken;
 import com.macias34.codemastery.user.entity.InvoiceDetailsEntity;
 import com.macias34.codemastery.user.entity.PersonalDetailsEntity;
 import com.macias34.codemastery.user.entity.UserEntity;
@@ -19,12 +20,15 @@ import com.macias34.codemastery.user.mapper.InvoiceDetailsMapper;
 import com.macias34.codemastery.user.mapper.PersonalDetailsMapper;
 import com.macias34.codemastery.user.mapper.UserMapper;
 import com.macias34.codemastery.user.model.UserFilter;
+import com.macias34.codemastery.user.repository.ConfirmationTokenRepository;
 import com.macias34.codemastery.user.repository.InvoiceDetailsRepository;
 import com.macias34.codemastery.user.repository.PersonalDetailsRepository;
 import com.macias34.codemastery.user.repository.UserRepository;
 import com.macias34.codemastery.util.DtoValidator;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,10 +42,12 @@ public class UserService {
     private static final String USER_EXISTS_MESSAGE = "User with username %s already exists.";
     private static final String EMAIL_EXISTS_MESSAGE = "User with email %s already exists.";
     private static final String USER_DOESNT_EXIST_MESSAGE = "User with username %s doesn't exist.";
+    private static final String CONFIRMATION_TOKEN_DOESNT_EXIST_MESSAGE = "Confirmation token %s doesn't exist.";
 
     private UserRepository userRepository;
     private InvoiceDetailsRepository invoiceDetailsRepository;
     private PersonalDetailsRepository personalDetailsRepository;
+    private ConfirmationTokenRepository confirmationTokenRepository;
 
     private UserMapper userMapper;
     private InvoiceDetailsMapper invoiceDetailsMapper;
@@ -173,4 +179,18 @@ public class UserService {
                     String.format(USER_DOESNT_EXIST_MESSAGE, signInDto.getUsername()));
         }
     }
+
+    public void confirmEmail(String confirmationToken) {
+        ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
+        if (token == null) {
+            throw new ResourceNotFoundException(
+                    String.format(CONFIRMATION_TOKEN_DOESNT_EXIST_MESSAGE, confirmationToken));
+        }
+
+        UserEntity user = userRepository.findByEmailIgnoreCase(token.getEmail());
+
+        user.setHasConfirmedEmail(true);
+        userRepository.save(user);
+
+    };
 }

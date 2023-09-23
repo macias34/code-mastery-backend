@@ -2,6 +2,7 @@ package com.macias34.codemastery.user.entity;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,8 +16,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
 @Entity
 @Table(name = "confirmation_token")
@@ -28,7 +29,15 @@ public class ConfirmationToken {
 	@Column(name = "confirmation_token")
 	private String confirmationToken;
 
-	@Column(name = "created_date")
+	@Column(name = "created_at")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Timestamp createdDate;
+	private Timestamp createdAt;
+
+	private String email;
+
+	public ConfirmationToken(String email) {
+		this.email = email;
+		this.confirmationToken = UUID.randomUUID().toString();
+	}
+
 }
