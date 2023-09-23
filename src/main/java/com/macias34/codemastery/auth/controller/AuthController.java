@@ -1,5 +1,6 @@
 package com.macias34.codemastery.auth.controller;
 
+import com.macias34.codemastery.user.dto.UserDto;
 import com.macias34.codemastery.user.service.UserService;
 import jakarta.mail.MessagingException;
 import org.springframework.http.HttpStatus;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.macias34.codemastery.auth.dto.AuthResponseDto;
+import com.macias34.codemastery.auth.dto.SignInResponse;
 import com.macias34.codemastery.auth.dto.SignInDto;
 import com.macias34.codemastery.auth.dto.SignUpDto;
 import com.macias34.codemastery.auth.service.AuthService;
@@ -32,11 +33,11 @@ public class AuthController {
 	}
 
 	@PostMapping("/sign-in")
-	public ResponseEntity<AuthResponseDto> signIn(@RequestBody SignInDto signInDto) {
+	public ResponseEntity<SignInResponse> signIn(@RequestBody SignInDto signInDto) {
 		userService.checkIfUserDoesntExist(signInDto);
 
 		String token = authService.authenticateAndGenerateJwt(signInDto);
 
-		return new ResponseEntity<>(new AuthResponseDto(token), HttpStatus.OK);
+		return new ResponseEntity<>(new SignInResponse(token), HttpStatus.OK);
 	}
 }

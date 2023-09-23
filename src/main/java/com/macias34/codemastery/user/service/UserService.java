@@ -58,7 +58,6 @@ public class UserService {
 
     public UserResponseDto getAllUsers(UserFilter userFilter, int page, int size){
         Specification<UserEntity> spec = UserSpecification.withFilters(userFilter);
-
         Pageable paging = PageRequest.of(page, size);
         Page<UserEntity> usersPage = userRepository.findAll(spec,paging);
 
@@ -72,29 +71,41 @@ public class UserService {
     }
 
     public UserDto getUserById(int id) {
-        UserEntity user = userRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("User not found"));
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return userMapper.fromEntityToDto(user);
+    }
+
+    public UserDto getUserByUsername(String username) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return userMapper.fromEntityToDto(user);
     }
 
     @Transactional
     public UserDto updateUser(int id, UpdateUserDto dto, String loggedUserUsername) {
-        UserEntity user = userRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("User not found"));
-        UserEntity loggedUser = userRepository.findByUsername(loggedUserUsername).orElseThrow(()->new ResourceNotFoundException("User not found"));
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        UserEntity loggedUser = userRepository.findByUsername(loggedUserUsername)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        if(loggedUser.getId()!=user.getId() && loggedUser.getRole() != UserRole.ADMIN){
+        if (loggedUser.getId() != user.getId() && loggedUser.getRole() != UserRole.ADMIN) {
             throw new NoPermissionException("You cannot update others' user data");
         }
 
-        if(dto.getPersonalDetails() != null){
+        if (dto.getPersonalDetails() != null) {
             UpdatePersonalDetailsDto personalDetailsDto = dto.getPersonalDetails();
             DtoValidator.validate(personalDetailsDto);
 
-            PersonalDetailsEntity personalDetails = personalDetailsService.updatePersonalDetails(user.getPersonalDetails().getId(),personalDetailsDto);
+            PersonalDetailsEntity personalDetails = personalDetailsService
+                    .updatePersonalDetails(user.getPersonalDetails().getId(), personalDetailsDto);
             user.setPersonalDetails(personalDetails);
 
-            // TODO Rethink should update invoiceDetails when invoiceDetailsSameAsPersonal=true even if personalDetails are empty (getting previuos val)
+            // TODO Rethink should update invoiceDetails when
+            // invoiceDetailsSameAsPersonal=true even if personalDetails are empty (getting
+            // previuos val)
 
-            if(dto.isInvoiceDetailsSameAsPersonal()){
+            if (dto.isInvoiceDetailsSameAsPersonal()) {
                 UpdateInvoiceDetailsDto invoiceDetailsDto = UpdateInvoiceDetailsDto.builder()
                         .firstName(personalDetails.getFirstName())
                         .lastName(personalDetails.getLastName())
@@ -103,36 +114,38 @@ public class UserService {
                         .city(personalDetails.getCity())
                         .phoneNumber(personalDetails.getPhoneNumber()).build();
 
-                InvoiceDetailsEntity invoiceDetails = invoiceDetailsService.updateInvoiceDetails(user.getInvoiceDetails().getId(),invoiceDetailsDto);
+                InvoiceDetailsEntity invoiceDetails = invoiceDetailsService
+                        .updateInvoiceDetails(user.getInvoiceDetails().getId(), invoiceDetailsDto);
                 user.setInvoiceDetails(invoiceDetails);
             }
         }
 
-        if(dto.getInvoiceDetails() != null){
+        if (dto.getInvoiceDetails() != null) {
             UpdateInvoiceDetailsDto invoiceDetailsDto = dto.getInvoiceDetails();
             DtoValidator.validate(invoiceDetailsDto);
 
-            InvoiceDetailsEntity invoiceDetails = invoiceDetailsService.updateInvoiceDetails(user.getInvoiceDetails().getId(),invoiceDetailsDto);
+            InvoiceDetailsEntity invoiceDetails = invoiceDetailsService
+                    .updateInvoiceDetails(user.getInvoiceDetails().getId(), invoiceDetailsDto);
             user.setInvoiceDetails(invoiceDetails);
         }
 
         DtoValidator.validate(dto);
 
-        if(dto.getUsername() != null){
+        if (dto.getUsername() != null) {
             checkIfUserExists(SignUpDto.builder().username(dto.getUsername()).build());
             user.setUsername(dto.getUsername());
         }
 
-        if(dto.getRole() != null){
+        if (dto.getRole() != null) {
             user.setRole(dto.getRole());
         }
 
-        if(dto.getEmail() != null){
+        if (dto.getEmail() != null) {
             checkIfUserExists(SignUpDto.builder().email(dto.getEmail()).build());
             user.setEmail(dto.getEmail());
         }
 
-        if(dto.getNote() != null){
+        if (dto.getNote() != null) {
             user.setNote(dto.getNote());
         }
 

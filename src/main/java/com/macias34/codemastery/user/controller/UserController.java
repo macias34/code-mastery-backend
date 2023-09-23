@@ -42,22 +42,29 @@ public class UserController {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<UserDto> getUserById(
-			@PathVariable int id
-	){
+			@PathVariable int id) {
 		return ResponseEntity.ok(userService.getUserById(id));
+	}
+
+	@GetMapping("/me")
+	public ResponseEntity<UserDto> getCurrentUserDto() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		UserDto userDto = userService.getUserByUsername(authentication.getName());
+
+		return ResponseEntity.ok(userDto);
 	}
 
 	@PatchMapping("/{id}")
 	public ResponseEntity<UserDto> updateUser(
 			@PathVariable int id,
-			@RequestBody UpdateUserDto dto
-	){
+			@RequestBody UpdateUserDto dto) {
 		// todo check if someone has username or email
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 		String loggedUserUserName = authentication.getName();
 
-		return ResponseEntity.ok(userService.updateUser(id,dto, loggedUserUserName));
+		return ResponseEntity.ok(userService.updateUser(id, dto, loggedUserUserName));
 	}
 
 }

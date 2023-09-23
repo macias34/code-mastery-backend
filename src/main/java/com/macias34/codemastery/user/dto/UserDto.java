@@ -1,11 +1,7 @@
 package com.macias34.codemastery.user.dto;
 
 import com.macias34.codemastery.course.dto.course.CourseDto;
-import com.macias34.codemastery.course.dto.course.UsersCourseDto;
-import com.macias34.codemastery.course.entity.CourseEntity;
 import com.macias34.codemastery.order.entity.OrderEntity;
-import com.macias34.codemastery.user.entity.InvoiceDetailsEntity;
-import com.macias34.codemastery.user.entity.PersonalDetailsEntity;
 import com.macias34.codemastery.user.entity.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,6 +28,6 @@ public class UserDto {
     private UserRole role;
     private PersonalDetailsDto personalDetails;
     private InvoiceDetailsDto invoiceDetails;
-    private Set<UsersCourseDto> courses = new HashSet<>();
-    private List<OrderEntity> orders = new ArrayList<>(); // TODO order dto
+    private Set<CourseDto> courses = new HashSet<>();
+    // private List<OrderEntity> orders = new ArrayList<>(); // TODO order dto
 }
