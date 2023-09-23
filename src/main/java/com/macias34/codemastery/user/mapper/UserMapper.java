@@ -11,6 +11,7 @@ import org.mapstruct.Mapping;
 public interface UserMapper {
     @Mapping(target = "personalDetails", source = "personalDetails")
     @Mapping(target = "invoiceDetails", source = "invoiceDetails")
-//    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "createdAt", source = "createdAt")
+    @Mapping(target = "updatedAt", source = "updatedAt")
     UserDto fromEntityToDto(UserEntity user);
 }

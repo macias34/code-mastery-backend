@@ -8,5 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
+
+
     CategoryDto fromEntityToDto(CategoryEntity categoryEntity);
 }

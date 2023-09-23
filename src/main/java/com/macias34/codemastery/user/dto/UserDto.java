@@ -28,6 +28,7 @@ public class UserDto {
     private String email;
     private String note;
     private Timestamp createdAt;
+    private Timestamp updatedAt;
     private UserRole role;
     private PersonalDetailsDto personalDetails;
     private InvoiceDetailsDto invoiceDetails;

@@ -10,6 +10,7 @@ import com.macias34.codemastery.course.entity.CategoryEntity;
 import com.macias34.codemastery.course.entity.CourseEntity;
 import com.macias34.codemastery.order.entity.OrderEntity;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -29,6 +30,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import jakarta.persistence.GenerationType;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "user_")
@@ -43,7 +46,6 @@ public class UserEntity {
 	private int id;
 	private String username;
 	private String email;
-	private Timestamp createdAt;
 
 	@Enumerated(EnumType.STRING)
 	private UserRole role;
@@ -61,6 +63,13 @@ public class UserEntity {
 	@OneToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
 	@JoinColumn(name = "invoice_details_id",referencedColumnName = "id")
 	private InvoiceDetailsEntity invoiceDetails;
+
+	@Column(name = "created_at")
+	@CreationTimestamp
+	private Timestamp createdAt;
+	@Column(name = "updated_at")
+	@UpdateTimestamp
+	private Timestamp updatedAt;
 
 //	@JsonManagedReference
 	@ManyToMany(fetch= FetchType.LAZY)
