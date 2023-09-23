@@ -1,5 +1,6 @@
 package com.macias34.codemastery.user.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.macias34.codemastery.user.dto.UpdateUserDto;
@@ -7,6 +8,9 @@ import com.macias34.codemastery.user.dto.UserDto;
 import com.macias34.codemastery.user.entity.UserRole;
 import com.macias34.codemastery.user.model.UserFilter;
 import com.macias34.codemastery.user.service.UserService;
+
+import io.github.cdimascio.dotenv.Dotenv;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity.BodyBuilder;
@@ -66,8 +70,17 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/confirm-email", method = { RequestMethod.GET, RequestMethod.POST })
-	public ResponseEntity<Void> confirmEmail(@RequestParam("token") String confirmationToken) {
+	public ResponseEntity<?> confirmEmail(@RequestParam("token") String confirmationToken,
+			HttpServletResponse httpResponse) {
 		userService.confirmEmail(confirmationToken);
+
+		String frontendUrl = Dotenv.load().get("FRONTEND_URL") + "/auth?emailConfirmed";
+		try {
+			httpResponse.sendRedirect(frontendUrl);
+
+		} catch (IOException exception) {
+			System.out.println(exception);
+		}
 
 		return ResponseEntity.ok().build();
 	}
