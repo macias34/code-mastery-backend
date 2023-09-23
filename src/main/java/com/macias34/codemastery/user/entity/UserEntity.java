@@ -69,11 +69,10 @@ public class UserEntity {
 	@JoinColumn(name = "invoice_details_id", referencedColumnName = "id")
 	private InvoiceDetailsEntity invoiceDetails;
 
-	// @JsonManagedReference
-	@ManyToMany(fetch = FetchType.LAZY)
 	@Column(name = "created_at")
 	@CreationTimestamp
 	private Timestamp createdAt;
+
 	@Column(name = "updated_at")
 	@UpdateTimestamp
 	private Timestamp updatedAt;
