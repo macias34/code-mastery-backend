@@ -1,13 +1,17 @@
 package com.macias34.codemastery.auth.service;
 
+import com.macias34.codemastery.exception.NoPermissionException;
 import com.macias34.codemastery.mail.service.MailService;
 import com.macias34.codemastery.user.dto.InvoiceDetailsDto;
+import com.macias34.codemastery.user.dto.PasswordChangeDto;
 import com.macias34.codemastery.user.dto.PersonalDetailsDto;
+import com.macias34.codemastery.user.dto.UserDto;
 import com.macias34.codemastery.user.entity.ConfirmationToken;
 import com.macias34.codemastery.user.entity.InvoiceDetailsEntity;
 import com.macias34.codemastery.user.entity.PersonalDetailsEntity;
 import com.macias34.codemastery.user.mapper.InvoiceDetailsMapper;
 import com.macias34.codemastery.user.mapper.PersonalDetailsMapper;
+import com.macias34.codemastery.user.mapper.UserMapper;
 import com.macias34.codemastery.user.repository.ConfirmationTokenRepository;
 import com.macias34.codemastery.user.repository.InvoiceDetailsRepository;
 import com.macias34.codemastery.user.repository.PersonalDetailsRepository;
@@ -56,18 +60,11 @@ public class AuthService {
 	private MailService mailService;
 	private UserService userService;
 
+	private UserMapper userMapper;
+
 	public String authenticateAndGenerateJwt(SignInDto signInDto) throws BadCredentialsException {
 		Authentication authentication = authenticate(signInDto);
 		return jwtGenerator.generateToken(authentication);
-	}
-
-	private Authentication authenticate(SignInDto signInDto) {
-		try {
-			return authenticationManager.authenticate(
-					new UsernamePasswordAuthenticationToken(signInDto.getUsername(), signInDto.getPassword()));
-		} catch (BadCredentialsException e) {
-			throw new WrongCredentialsException(String.format(WRONG_CREDENTIALS_MESSAGE, signInDto.getUsername()));
-		}
 	}
 
 	@Transactional
@@ -87,7 +84,7 @@ public class AuthService {
 		}
 
 		DtoValidator.validate(signUpDto);
-
+		// todo checking if user exists only for users with hasEmailConfirmed
 		userService.checkIfUserExists(signUpDto);
 
 		UserEntity user = createUserEntity(signUpDto);
@@ -99,12 +96,53 @@ public class AuthService {
 
 		String mailMessage = "Click this link to confirm your email: " + tokenConfirmationUrl;
 
+		// todo create good looking mail layout
 		mailService.sendMail("Confirm your email", mailMessage, user.getEmail());
 
 		confirmationTokenRepository.save(confirmationToken);
 		personalDetailsRepository.save(user.getPersonalDetails());
 		invoiceDetailsRepository.save(user.getInvoiceDetails());
 		userRepository.save(user);
+	}
+
+	@Transactional
+	public UserDto changePassword(int id, PasswordChangeDto dto, String loggedUserUsername) {
+		UserEntity user = userRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
+		UserEntity loggedUser = userRepository.findByUsername(loggedUserUsername)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+		if (loggedUser.getId() != user.getId()) {
+			throw new NoPermissionException("You cannot change others' user password");
+		}
+
+		Authentication authentication = authenticate(
+				new SignInDto(
+						loggedUserUsername,
+						dto.getOldPassword()
+				)
+		);
+
+		if(!authentication.isAuthenticated()){
+			throw new WrongCredentialsException("Wrong credientals provided");
+		}
+
+		DtoValidator.validate(dto);
+
+		user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+
+		userRepository.save(user);
+
+		return userMapper.fromEntityToDto(user);
+	}
+
+	private Authentication authenticate(SignInDto signInDto) {
+		try {
+			return authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(signInDto.getUsername(), signInDto.getPassword()));
+		} catch (BadCredentialsException e) {
+			throw new WrongCredentialsException(String.format(WRONG_CREDENTIALS_MESSAGE, signInDto.getUsername()));
+		}
 	}
 
 	private UserEntity createUserEntity(SignUpDto signUpDto) {

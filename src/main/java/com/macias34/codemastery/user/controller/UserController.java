@@ -3,6 +3,8 @@ package com.macias34.codemastery.user.controller;
 import java.io.IOException;
 import java.util.List;
 
+import com.macias34.codemastery.auth.service.AuthService;
+import com.macias34.codemastery.user.dto.PasswordChangeDto;
 import com.macias34.codemastery.user.dto.UpdateUserDto;
 import com.macias34.codemastery.user.dto.UserDto;
 import com.macias34.codemastery.user.dto.UserResponseDto;
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
 	private final UserService userService;
+	private final AuthService authService;
 
 	// TODO all needed crud methods
 	@GetMapping("")
@@ -71,6 +74,17 @@ public class UserController {
 		String loggedUserUserName = authentication.getName();
 
 		return ResponseEntity.ok(userService.updateUser(id, dto, loggedUserUserName));
+	}
+
+	@PatchMapping("/{id}/password")
+	public ResponseEntity<UserDto> changePassword(
+			@PathVariable int id,
+			@RequestBody PasswordChangeDto dto) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		String loggedUserUsername = authentication.getName();
+
+		return ResponseEntity.ok(authService.changePassword(id, dto, loggedUserUsername));
 	}
 
 	@RequestMapping(value = "/confirm-email", method = { RequestMethod.GET, RequestMethod.POST })

@@ -2,11 +2,14 @@ package com.macias34.codemastery.user.service;
 
 import com.macias34.codemastery.auth.dto.SignInDto;
 import com.macias34.codemastery.auth.dto.SignUpDto;
+import com.macias34.codemastery.auth.service.AuthService;
 import com.macias34.codemastery.exception.EmailNotConfirmedException;
 import com.macias34.codemastery.exception.NoPermissionException;
 import com.macias34.codemastery.exception.ResourceAlreadyExistsException;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
+import com.macias34.codemastery.exception.WrongCredentialsException;
 import com.macias34.codemastery.user.dto.InvoiceDetailsDto;
+import com.macias34.codemastery.user.dto.PasswordChangeDto;
 import com.macias34.codemastery.user.dto.PersonalDetailsDto;
 import com.macias34.codemastery.user.dto.UpdateInvoiceDetailsDto;
 import com.macias34.codemastery.user.dto.UpdatePersonalDetailsDto;
@@ -36,6 +39,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -63,6 +68,8 @@ public class UserService {
 
     private PersonalDetailsService personalDetailsService;
     private InvoiceDetailsService invoiceDetailsService;
+
+    private PasswordEncoder passwordEncoder;
 
     public UserResponseDto getAllUsers(UserFilter userFilter, int page, int size) {
         Specification<UserEntity> spec = UserSpecification.withFilters(userFilter);
@@ -171,6 +178,21 @@ public class UserService {
         return userMapper.fromEntityToDto(user);
     }
 
+    public void confirmEmail(String confirmationToken) {
+        ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
+        if (token == null) {
+            throw new ResourceNotFoundException(
+                    String.format(CONFIRMATION_TOKEN_DOESNT_EXIST_MESSAGE, confirmationToken));
+        }
+
+        UserEntity user = userRepository.findByEmailIgnoreCase(token.getEmail());
+
+        user.setHasConfirmedEmail(true);
+        userRepository.save(user);
+
+    };
+
+
     public void checkIfUserExists(SignUpDto signUpDto) throws ResourceAlreadyExistsException {
         if (userRepository.existsByUsername(signUpDto.getUsername())) {
             throw new ResourceAlreadyExistsException(
@@ -198,17 +220,5 @@ public class UserService {
         }
     }
 
-    public void confirmEmail(String confirmationToken) {
-        ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
-        if (token == null) {
-            throw new ResourceNotFoundException(
-                    String.format(CONFIRMATION_TOKEN_DOESNT_EXIST_MESSAGE, confirmationToken));
-        }
 
-        UserEntity user = userRepository.findByEmailIgnoreCase(token.getEmail());
-
-        user.setHasConfirmedEmail(true);
-        userRepository.save(user);
-
-    };
 }
