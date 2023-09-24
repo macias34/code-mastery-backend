@@ -93,6 +93,8 @@ public class UserService {
             throw new NoPermissionException("You cannot update others' user data");
         }
 
+
+
         if (dto.getPersonalDetails() != null) {
             UpdatePersonalDetailsDto personalDetailsDto = dto.getPersonalDetails();
             DtoValidator.validate(personalDetailsDto);
@@ -132,7 +134,9 @@ public class UserService {
         DtoValidator.validate(dto);
 
         if (dto.getUsername() != null) {
-            checkIfUserExists(SignUpDto.builder().username(dto.getUsername()).build());
+            if(!loggedUserUsername.equals(dto.getUsername())){
+                checkIfUserExists(SignUpDto.builder().username(dto.getUsername()).build());
+            }
             user.setUsername(dto.getUsername());
         }
 
@@ -141,11 +145,16 @@ public class UserService {
         }
 
         if (dto.getEmail() != null) {
-            checkIfUserExists(SignUpDto.builder().email(dto.getEmail()).build());
+            if(!loggedUser.getEmail().equals(dto.getEmail())){
+                checkIfUserExists(SignUpDto.builder().email(dto.getEmail()).build());
+            }
             user.setEmail(dto.getEmail());
         }
 
         if (dto.getNote() != null) {
+            if(loggedUser.getRole() == UserRole.USER){
+                throw new NoPermissionException("You cannot add note for user");
+            }
             user.setNote(dto.getNote());
         }
 

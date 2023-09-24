@@ -59,7 +59,7 @@ public class UserController {
 	public ResponseEntity<UserDto> updateUser(
 			@PathVariable int id,
 			@RequestBody UpdateUserDto dto) {
-		// todo check if someone has username or email
+		// todo password change enpoint
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 		String loggedUserUserName = authentication.getName();
