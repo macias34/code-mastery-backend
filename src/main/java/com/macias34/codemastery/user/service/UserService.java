@@ -2,6 +2,7 @@ package com.macias34.codemastery.user.service;
 
 import com.macias34.codemastery.auth.dto.SignInDto;
 import com.macias34.codemastery.auth.dto.SignUpDto;
+import com.macias34.codemastery.exception.EmailNotConfirmedException;
 import com.macias34.codemastery.exception.NoPermissionException;
 import com.macias34.codemastery.exception.ResourceAlreadyExistsException;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
@@ -11,6 +12,7 @@ import com.macias34.codemastery.user.dto.UpdateInvoiceDetailsDto;
 import com.macias34.codemastery.user.dto.UpdatePersonalDetailsDto;
 import com.macias34.codemastery.user.dto.UpdateUserDto;
 import com.macias34.codemastery.user.dto.UserDto;
+import com.macias34.codemastery.user.entity.ConfirmationToken;
 import com.macias34.codemastery.user.dto.UserResponseDto;
 import com.macias34.codemastery.user.entity.InvoiceDetailsEntity;
 import com.macias34.codemastery.user.entity.PersonalDetailsEntity;
@@ -20,6 +22,7 @@ import com.macias34.codemastery.user.mapper.InvoiceDetailsMapper;
 import com.macias34.codemastery.user.mapper.PersonalDetailsMapper;
 import com.macias34.codemastery.user.mapper.UserMapper;
 import com.macias34.codemastery.user.model.UserFilter;
+import com.macias34.codemastery.user.repository.ConfirmationTokenRepository;
 import com.macias34.codemastery.user.model.UserSpecification;
 import com.macias34.codemastery.user.repository.InvoiceDetailsRepository;
 import com.macias34.codemastery.user.repository.PersonalDetailsRepository;
@@ -27,6 +30,8 @@ import com.macias34.codemastery.user.repository.UserRepository;
 import com.macias34.codemastery.util.DtoValidator;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -41,13 +46,16 @@ import java.util.function.Predicate;
 @AllArgsConstructor
 public class UserService {
 
-    private static final String USER_EXISTS_MESSAGE = "User with username %s already exists.";
+    private static final String USER_EXISTS_MESSAGE = "User %s already exists.";
     private static final String EMAIL_EXISTS_MESSAGE = "User with email %s already exists.";
-    private static final String USER_DOESNT_EXIST_MESSAGE = "User with username %s doesn't exist.";
+    private static final String USER_DOESNT_EXIST_MESSAGE = "User %s doesn't exist.";
+    private static final String CONFIRMATION_TOKEN_DOESNT_EXIST_MESSAGE = "Confirmation token %s doesn't exist.";
+    private static final String USER_NOT_CONFIRMED_EMAIL_MESSAGE = "User %s hasn't confirmed email.";
 
     private UserRepository userRepository;
     private InvoiceDetailsRepository invoiceDetailsRepository;
     private PersonalDetailsRepository personalDetailsRepository;
+    private ConfirmationTokenRepository confirmationTokenRepository;
 
     private UserMapper userMapper;
     private InvoiceDetailsMapper invoiceDetailsMapper;
@@ -56,14 +64,14 @@ public class UserService {
     private PersonalDetailsService personalDetailsService;
     private InvoiceDetailsService invoiceDetailsService;
 
-    public UserResponseDto getAllUsers(UserFilter userFilter, int page, int size){
+    public UserResponseDto getAllUsers(UserFilter userFilter, int page, int size) {
         Specification<UserEntity> spec = UserSpecification.withFilters(userFilter);
         Pageable paging = PageRequest.of(page, size);
-        Page<UserEntity> usersPage = userRepository.findAll(spec,paging);
+        Page<UserEntity> usersPage = userRepository.findAll(spec, paging);
 
         List<UserDto> userDtos = usersPage.stream().map(userMapper::fromEntityToDto).toList();
 
-        return  UserResponseDto.builder()
+        return UserResponseDto.builder()
                 .users(userDtos)
                 .totalElements(usersPage.getTotalElements())
                 .totalPages(usersPage.getTotalPages())
@@ -181,4 +189,26 @@ public class UserService {
                     String.format(USER_DOESNT_EXIST_MESSAGE, signInDto.getUsername()));
         }
     }
+
+    public void checkIfUserHasConfirmedEmail(SignInDto signInDto) {
+        boolean hasConfirmedEmail = userRepository.findByUsername(signInDto.getUsername()).get().hasConfirmedEmail();
+        if (!hasConfirmedEmail) {
+            throw new EmailNotConfirmedException(
+                    String.format(USER_NOT_CONFIRMED_EMAIL_MESSAGE, signInDto.getUsername()));
+        }
+    }
+
+    public void confirmEmail(String confirmationToken) {
+        ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
+        if (token == null) {
+            throw new ResourceNotFoundException(
+                    String.format(CONFIRMATION_TOKEN_DOESNT_EXIST_MESSAGE, confirmationToken));
+        }
+
+        UserEntity user = userRepository.findByEmailIgnoreCase(token.getEmail());
+
+        user.setHasConfirmedEmail(true);
+        userRepository.save(user);
+
+    };
 }

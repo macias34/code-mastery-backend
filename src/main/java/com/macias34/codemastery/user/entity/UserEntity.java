@@ -24,6 +24,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.criteria.Order;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -52,38 +53,48 @@ public class UserEntity {
 	private String password;
 	private String note;
 
-//	@JsonManagedReference
-	@OneToMany(mappedBy = "user",fetch=FetchType.LAZY)
+	@Getter(AccessLevel.NONE)
+	@Column(name = "has_confirmed_email")
+	private boolean hasConfirmedEmail;
+
+	// @JsonManagedReference
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
 	private List<OrderEntity> orders;
 
-	@OneToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
-	@JoinColumn(name = "personal_details_id",referencedColumnName = "id")
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "personal_details_id", referencedColumnName = "id")
 	private PersonalDetailsEntity personalDetails;
 
-	@OneToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
-	@JoinColumn(name = "invoice_details_id",referencedColumnName = "id")
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "invoice_details_id", referencedColumnName = "id")
 	private InvoiceDetailsEntity invoiceDetails;
 
 	@Column(name = "created_at")
 	@CreationTimestamp
 	private Timestamp createdAt;
+
 	@Column(name = "updated_at")
 	@UpdateTimestamp
 	private Timestamp updatedAt;
 
-//	@JsonManagedReference
-	@ManyToMany(fetch= FetchType.LAZY)
+	// @JsonManagedReference
+	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "user_course", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "course_id") })
 	private Set<CourseEntity> courses = new HashSet<>();
 
-	public UserEntity(String username, String email, String password,String note, Timestamp createdAt, UserRole role) {
+	public UserEntity(String username, String email, String password, String note, Timestamp createdAt, UserRole role) {
 		this.username = username;
 		this.email = email;
 		this.password = password;
 		this.note = note;
 		this.createdAt = createdAt;
 		this.role = role;
+		this.hasConfirmedEmail = false;
+	}
+
+	public boolean hasConfirmedEmail() {
+		return hasConfirmedEmail;
 	}
 
 }
