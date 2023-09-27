@@ -8,6 +8,8 @@ import com.macias34.codemastery.course.model.CourseFilter;
 import com.macias34.codemastery.course.repository.CourseRepository;
 import com.macias34.codemastery.course.service.CourseService;
 import com.macias34.codemastery.security.service.CustomUserDetailsService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.apache.tika.Tika;
@@ -32,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Set;
 
 @RestController
+@Tag(name = "course")
 @RequestMapping("/course")
 @AllArgsConstructor
 public class CourseController {
@@ -47,8 +50,7 @@ public class CourseController {
             @RequestParam(defaultValue = "0") Integer minParticipantsCount,
             @RequestParam(defaultValue = "0") Integer categoryId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
+            @RequestParam(defaultValue = "10") int size) {
         CourseFilter courseFilter = new CourseFilter(name, minPrice, maxPrice, minParticipantsCount, categoryId);
 
         return ResponseEntity.ok(courseService.searchCourses(courseFilter, page, size));

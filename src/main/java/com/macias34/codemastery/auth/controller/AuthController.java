@@ -2,6 +2,8 @@ package com.macias34.codemastery.auth.controller;
 
 import com.macias34.codemastery.user.dto.UserDto;
 import com.macias34.codemastery.user.service.UserService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import com.macias34.codemastery.auth.service.AuthService;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
+@Tag(name = "auth")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {

@@ -5,6 +5,8 @@ import com.macias34.codemastery.course.dto.chapter.CreateChapterDto;
 import com.macias34.codemastery.course.dto.chapter.UpdateChapterDto;
 import com.macias34.codemastery.course.dto.lesson.LessonDto;
 import com.macias34.codemastery.course.service.ChapterService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,6 +22,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/chapter")
+@Tag(name = "chapter")
 @RequiredArgsConstructor
 public class ChapterController {
     private final ChapterService chapterService;

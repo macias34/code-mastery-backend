@@ -13,6 +13,7 @@ import com.macias34.codemastery.user.model.UserFilter;
 import com.macias34.codemastery.user.service.UserService;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Tag(name = "user")
 @RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
@@ -43,10 +45,9 @@ public class UserController {
 			@RequestParam(required = false) String email,
 			@RequestParam(required = false) UserRole role,
 			@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "10") int size
-	) {
-		UserFilter userFilter = new UserFilter(username,email,role);
-		return ResponseEntity.ok(userService.getAllUsers(userFilter,page,size));
+			@RequestParam(defaultValue = "10") int size) {
+		UserFilter userFilter = new UserFilter(username, email, role);
+		return ResponseEntity.ok(userService.getAllUsers(userFilter, page, size));
 	}
 
 	@GetMapping("/{id}")
