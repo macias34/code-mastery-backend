@@ -68,20 +68,10 @@ public class CourseController {
         return ResponseEntity.ok(courseService.deleteCourseById(id));
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<CourseDto> createCourse(
-            @RequestParam(value = "avatar") MultipartFile avatar,
-            // All RequestParam which are part of dto has required=false in order to get
-            // validated by DtoValidator
-            @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "price", required = false) Double price,
-            @RequestParam(value = "instructorName", required = false) String instructorName,
-            @RequestParam(value = "description", required = false) String description,
-            @RequestParam(value = "categoriesIds", required = false) Set<Integer> categoriesIds
+    @RequestMapping(method = RequestMethod.POST, value = "")
+    public ResponseEntity<CourseDto> createCourse() {
 
-    ) {
-        CreateCourseDto dto = new CreateCourseDto(name, price, instructorName, description, categoriesIds);
-        return ResponseEntity.ok(courseService.createCourse(dto, avatar));
+        return ResponseEntity.ok(courseService.createCourse());
     }
 
     @RequestMapping(method = RequestMethod.PATCH, value = "/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })

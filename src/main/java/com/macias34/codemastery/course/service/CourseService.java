@@ -41,96 +41,70 @@ public class CourseService {
     private final FileStorageService storageService;
     private final CourseMapper courseMapper;
 
-    public CourseResponseDto searchCourses(CourseFilter courseFilter, int page, int size){
+    public CourseResponseDto searchCourses(CourseFilter courseFilter, int page, int size) {
         Pageable paging = PageRequest.of(page, size);
-        Page<CourseEntity> coursesPage = this.courseRepository.searchCourseEntitiesByFilters(courseFilter,paging);
+        Page<CourseEntity> coursesPage = this.courseRepository.searchCourseEntitiesByFilters(courseFilter, paging);
         List<CourseEntity> courses = coursesPage.getContent();
 
-        if(courses.isEmpty()){
+        if (courses.isEmpty()) {
             throw new ResourceNotFoundException("Courses not found");
         }
 
         List<CourseDto> courseDtos = courses.stream().map(courseMapper::fromEntityToDto).toList();
 
-        return CourseResponseDto.builder().
-                currentPage(page)
+        return CourseResponseDto.builder().currentPage(page)
                 .totalElements(coursesPage.getTotalElements())
                 .totalPages(coursesPage.getTotalPages())
                 .courses(courseDtos).build();
     }
 
-    public CourseDto getCourseById(int id){
-        CourseEntity course = courseRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Course not found"));
+    public CourseDto getCourseById(int id) {
+        CourseEntity course = courseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         return courseMapper.fromEntityToDto(course);
     }
 
     @Transactional
-    public CourseDto deleteCourseById(int id){
-        CourseEntity course = courseRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Course not found"));
-        try{
+    public CourseDto deleteCourseById(int id) {
+        CourseEntity course = courseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
+        try {
             storageService.deleteByfileName(course.getId() + course.getAvatarFileExtension());
 
-            for (ChapterEntity chapter: course.getChapters()){
-                for (LessonEntity lesson: chapter.getLessons()){
-                    try{
-                        storageService.deleteByfileName(lesson.getId() +".mp4");
-                    }catch (Exception e){
+            for (ChapterEntity chapter : course.getChapters()) {
+                for (LessonEntity lesson : chapter.getLessons()) {
+                    try {
+                        storageService.deleteByfileName(lesson.getId() + ".mp4");
+                    } catch (Exception e) {
                         throw new StorageException("Error with removing file occurred");
                     }
                 }
             }
 
             courseRepository.deleteById(id);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new StorageException("Error with removing file occurred");
         }
 
         return courseMapper.fromEntityToDto(course);
     }
 
-    public CourseDto createCourse(CreateCourseDto dto, MultipartFile avatar){
-        DtoValidator.validate(dto);
+    public CourseDto createCourse() {
 
-        String extension = storageService.getExtension(avatar.getOriginalFilename());
+        CourseEntity courseEntity = new CourseEntity();
 
-        CourseEntity courseEntity = new CourseEntity(
-                dto.getName(),
-                dto.getPrice(),
-                dto.getInstructorName(),
-                0,
-                dto.getDescription(),
-                extension
-        );
-
-        Set<CategoryEntity> categories = new HashSet<>();
-
-        for (int categoryId: dto.getCategoriesIds()){
-            Optional<CategoryEntity> category = categoryRepository.findById(categoryId);
-            category.ifPresent(categories::add);
-        }
-
-        courseEntity.setCategories(categories);
-
-        try{
-            courseRepository.save(courseEntity);
-            storageService.save(avatar,courseEntity.getId(),"image mimetype");
-        }catch (Exception e){
-            courseRepository.deleteById(courseEntity.getId());
-            if(e instanceof BadRequestException){
-                throw e;
-            }
-            throw new StorageException("Error with saving file occured");
-        }
+        courseRepository.save(courseEntity);
 
         return courseMapper.fromEntityToDto(courseEntity);
     }
 
     public Resource getCourseAvatarById(int id) {
-        try{
-            CourseEntity course = courseRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Course not found"));
+        try {
+            CourseEntity course = courseRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
             return storageService.load(id + course.getAvatarFileExtension());
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("Error with returning file for given lesson");
         }
     }
@@ -139,43 +113,42 @@ public class CourseService {
     public CourseDto updateCourse(int id, UpdateCourseDto dto, MultipartFile avatar) {
         DtoValidator.validate(dto);
 
-        CourseEntity course = courseRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Course not found"));
-
+        CourseEntity course = courseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         Set<CategoryEntity> categories = new HashSet<>();
 
-        if(dto.getCategoriesIds() != null){
-            for (int categoryId: dto.getCategoriesIds()){
+        if (dto.getCategoriesIds() != null) {
+            for (int categoryId : dto.getCategoriesIds()) {
                 Optional<CategoryEntity> category = categoryRepository.findById(categoryId);
                 category.ifPresent(categories::add);
             }
             course.setCategories(categories);
         }
 
-        if(dto.getPrice() != null){
+        if (dto.getPrice() != null) {
             course.setPrice(dto.getPrice());
         }
-        if(dto.getDescription() != null){
+        if (dto.getDescription() != null) {
             course.setDescription(dto.getDescription());
         }
-        if(dto.getName() != null){
+        if (dto.getName() != null) {
             course.setName(dto.getName());
         }
-        if(dto.getInstructorName() != null){
+        if (dto.getInstructorName() != null) {
             course.setInstructorName(dto.getInstructorName());
         }
 
-
-        try{
-            if(avatar != null){
+        try {
+            if (avatar != null) {
                 String extension = storageService.getExtension(avatar.getOriginalFilename());
-                storageService.deleteByfileName(course.getId()+course.getAvatarFileExtension());
-                storageService.save(avatar,course.getId(),"image mimetype");
+                storageService.deleteByfileName(course.getId() + course.getAvatarFileExtension());
+                storageService.save(avatar, course.getId(), "image mimetype");
                 course.setAvatarFileExtension(extension);
             }
             courseRepository.save(course);
-        }catch (Exception e){
-            if(e instanceof BadRequestException){
+        } catch (Exception e) {
+            if (e instanceof BadRequestException) {
                 throw e;
             }
             throw new StorageException("Error with saving file occurred");

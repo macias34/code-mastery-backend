@@ -57,34 +57,31 @@ public class CourseEntity {
     @UpdateTimestamp
     private Timestamp updatedAt;
 
-    @ManyToMany(fetch= FetchType.LAZY)
-    @JoinTable(
-            name = "course_category",
-            joinColumns = { @JoinColumn(name = "course_id") },
-            inverseJoinColumns = { @JoinColumn(name = "category_id") }
-    )
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "course_category", joinColumns = { @JoinColumn(name = "course_id") }, inverseJoinColumns = {
+            @JoinColumn(name = "category_id") })
     private Set<CategoryEntity> categories = new HashSet<>();
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch=FetchType.LAZY)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<PropertyEntity> properties = new HashSet<>();
 
-//    @JsonBackReference
-    @ManyToMany(mappedBy = "courses", fetch=FetchType.LAZY)
+    // @JsonBackReference
+    @ManyToMany(mappedBy = "courses", fetch = FetchType.LAZY)
     private Set<UserEntity> users = new HashSet<>();
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch=FetchType.LAZY)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ChapterEntity> chapters;
 
-//    @JsonBackReference
-    @ManyToMany(fetch=FetchType.LAZY, mappedBy = "courses")
+    // @JsonBackReference
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "courses")
     private List<OrderEntity> orders;
 
-    public CourseEntity(String name, double price, String instructorName, int participantsCount, String description,String avatarFileExtension) {
+    public CourseEntity(String name, double price, String instructorName, int participantsCount, String description) {
         this.name = name;
         this.price = price;
         this.instructorName = instructorName;
         this.participantsCount = participantsCount;
         this.description = description;
-        this.avatarFileExtension = avatarFileExtension;
     }
+
 }
