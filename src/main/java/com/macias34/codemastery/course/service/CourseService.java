@@ -92,7 +92,7 @@ public class CourseService {
 
     public CourseDto createCourse() {
 
-        CourseEntity courseEntity = new CourseEntity();
+        CourseEntity courseEntity = CourseEntity.builder().name("Untitled course").build();
 
         courseRepository.save(courseEntity);
 
