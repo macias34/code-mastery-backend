@@ -8,10 +8,12 @@ import com.macias34.codemastery.course.entity.CategoryEntity;
 import com.macias34.codemastery.course.entity.ChapterEntity;
 import com.macias34.codemastery.course.entity.CourseEntity;
 import com.macias34.codemastery.course.entity.LessonEntity;
+import com.macias34.codemastery.course.entity.ThumbnailEntity;
 import com.macias34.codemastery.course.mapper.CourseMapper;
 import com.macias34.codemastery.course.model.CourseFilter;
 import com.macias34.codemastery.course.repository.CategoryRepository;
 import com.macias34.codemastery.course.repository.CourseRepository;
+import com.macias34.codemastery.course.repository.ThumbnailRepository;
 import com.macias34.codemastery.exception.BadRequestException;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
 import com.macias34.codemastery.exception.StorageException;
@@ -43,6 +45,7 @@ import java.util.Set;
 public class CourseService {
     private final CourseRepository courseRepository;
     private final CategoryRepository categoryRepository;
+    private final ThumbnailRepository thumbnailRepository;
     private final StorageService storageService;
     private final CourseMapper courseMapper;
 
@@ -78,7 +81,7 @@ public class CourseService {
     public CourseDto deleteCourseById(int id) {
         CourseEntity course = findCourseOrThrow(id);
         try {
-            storageService.deleteFile(course.getId() + course.getThumbnailSrc());
+            storageService.deleteFile(course.getThumbnail().getObjectName());
 
             for (ChapterEntity chapter : course.getChapters()) {
                 for (LessonEntity lesson : chapter.getLessons()) {
@@ -121,8 +124,11 @@ public class CourseService {
         storageService.uploadPublicFile(objectName, file);
 
         String fileSrc = Dotenv.load().get("S3_CDN_ENDPOINT") + "/" + objectName;
-        courseEntity.setThumbnailSrc(fileSrc);
 
+        ThumbnailEntity thumbnailEntity = new ThumbnailEntity(fileSrc, objectName, courseEntity);
+        thumbnailRepository.save(thumbnailEntity);
+
+        courseEntity.setThumbnail(thumbnailEntity);
     }
 
     @Transactional

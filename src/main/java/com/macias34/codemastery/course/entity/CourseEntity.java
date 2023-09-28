@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,8 +42,7 @@ public class CourseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
-    @Column(name = "thumbnail_src")
-    private String thumbnailSrc;
+
     private double price;
     @Column(name = "instructor_name")
     private String instructorName;
@@ -56,6 +56,10 @@ public class CourseEntity {
     @Column(name = "updated_at")
     @UpdateTimestamp
     private Timestamp updatedAt;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "thumbnail_id", referencedColumnName = "id")
+    private ThumbnailEntity thumbnail;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "course_category", joinColumns = { @JoinColumn(name = "course_id") }, inverseJoinColumns = {
