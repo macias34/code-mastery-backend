@@ -1,4 +1,4 @@
-package com.macias34.codemastery.upload.config;
+package com.macias34.codemastery.storage.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -11,7 +11,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
 @Configuration
-public class UploadConfig {
+public class StorageConfig {
 
 	@Value("${cloud.do.credentials.accessKey}")
 	private String awsId;

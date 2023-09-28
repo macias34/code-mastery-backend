@@ -1,4 +1,4 @@
-package com.macias34.codemastery.upload.service;
+package com.macias34.codemastery.storage.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,9 +27,7 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 @Service
-public class UploadService {
-
-	private Logger logger = LoggerFactory.getLogger(UploadService.class);
+public class StorageService {
 
 	@Autowired
 	@Qualifier("code-mastery")
@@ -48,25 +46,14 @@ public class UploadService {
 	 * @param file
 	 * @return String
 	 */
-	public void uploadFile(final String fileName, final MultipartFile file) {
-		try {
-			ObjectMetadata metadata = new ObjectMetadata();
-			metadata.setContentLength(file.getSize());
-			metadata.setContentType(contentType(file));
+	public void uploadFile(final String fileName, final MultipartFile file) throws IOException {
+		ObjectMetadata metadata = new ObjectMetadata();
+		metadata.setContentLength(file.getSize());
+		metadata.setContentType(contentType(file));
 
-			PutObjectResult result = amazonS3Client.putObject(bucketName, fileName, file.getInputStream(), metadata);
+		PutObjectResult result = amazonS3Client.putObject(bucketName, fileName, file.getInputStream(), metadata);
 
-			System.out.println("Content - Length in KB : " + result.getMetadata().getContentLength());
-
-		} catch (IOException ioe) {
-			logger.error("IOException: " + ioe.getMessage());
-		} catch (AmazonServiceException serviceException) {
-			logger.info("AmazonServiceException: " + serviceException.getMessage());
-			throw serviceException;
-		} catch (AmazonClientException clientException) {
-			logger.info("AmazonClientException Message: " + clientException.getMessage());
-			throw clientException;
-		}
+		System.out.println("Content - Length in KB : " + result.getMetadata().getContentLength());
 
 	}
 
@@ -87,30 +74,19 @@ public class UploadService {
 	 * @param keyName
 	 * @return ByteArrayOutputStream
 	 */
-	public ByteArrayOutputStream downloadFile(String keyName) {
-		try {
-			S3Object s3object = amazonS3Client.getObject(new GetObjectRequest(bucketName, keyName));
+	public ByteArrayOutputStream downloadFile(String keyName) throws IOException {
+		S3Object s3object = amazonS3Client.getObject(new GetObjectRequest(bucketName, keyName));
 
-			InputStream is = s3object.getObjectContent();
-			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-			int len;
-			byte[] buffer = new byte[4096];
-			while ((len = is.read(buffer, 0, buffer.length)) != -1) {
-				outputStream.write(buffer, 0, len);
-			}
-
-			return outputStream;
-		} catch (IOException ioException) {
-			logger.error("IOException: " + ioException.getMessage());
-		} catch (AmazonServiceException serviceException) {
-			logger.info("AmazonServiceException Message:    " + serviceException.getMessage());
-			throw serviceException;
-		} catch (AmazonClientException clientException) {
-			logger.info("AmazonClientException Message: " + clientException.getMessage());
-			throw clientException;
+		InputStream is = s3object.getObjectContent();
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		int len;
+		byte[] buffer = new byte[4096];
+		while ((len = is.read(buffer, 0, buffer.length)) != -1) {
+			outputStream.write(buffer, 0, len);
 		}
 
-		return null;
+		return outputStream;
+
 	}
 
 	/**

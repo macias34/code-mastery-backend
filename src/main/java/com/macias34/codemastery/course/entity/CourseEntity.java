@@ -41,8 +41,8 @@ public class CourseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
-    @Column(name = "avatar_file_extension")
-    private String avatarFileExtension;
+    @Column(name = "thumbnail_src")
+    private String thumbnailSrc;
     private double price;
     @Column(name = "instructor_name")
     private String instructorName;

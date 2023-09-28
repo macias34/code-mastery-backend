@@ -74,7 +74,7 @@ public class CourseController {
         return ResponseEntity.ok(courseService.createCourse());
     }
 
-    // TODO : rename avatar to thumbnail and implement upload
+    // TODO : implement upload
     @RequestMapping(method = RequestMethod.PATCH, value = "/{id}")
     public ResponseEntity<CourseDto> updateCourse(
             @PathVariable int id, @RequestBody UpdateCourseDto updateCourseDto
@@ -83,10 +83,10 @@ public class CourseController {
         return ResponseEntity.ok(courseService.updateCourse(id, updateCourseDto));
     }
 
-    @GetMapping("/avatar/{id}")
-    public ResponseEntity<Resource> getCourseAvatarById(
+    @GetMapping("/thumbnail/{id}")
+    public ResponseEntity<Resource> getCourseThumbnailById(
             @PathVariable int id) {
-        Resource image = courseService.getCourseAvatarById(id);
+        Resource image = courseService.getCourseThumbnailById(id);
         Tika tika = new Tika();
         String mimeType = tika.detect(image.getFilename());
 

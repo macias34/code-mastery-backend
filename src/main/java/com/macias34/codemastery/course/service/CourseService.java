@@ -15,6 +15,7 @@ import com.macias34.codemastery.course.repository.CourseRepository;
 import com.macias34.codemastery.exception.BadRequestException;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
 import com.macias34.codemastery.exception.StorageException;
+import com.macias34.codemastery.storage.service.StorageService;
 import com.macias34.codemastery.util.DateTimeUtil;
 import com.macias34.codemastery.util.DtoValidator;
 import jakarta.transaction.Transactional;
@@ -38,7 +39,7 @@ import java.util.Set;
 public class CourseService {
     private final CourseRepository courseRepository;
     private final CategoryRepository categoryRepository;
-    private final FileStorageService storageService;
+    private final StorageService storageService;
     private final CourseMapper courseMapper;
 
     public CourseResponseDto searchCourses(CourseFilter courseFilter, int page, int size) {
@@ -70,12 +71,12 @@ public class CourseService {
         CourseEntity course = courseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
         try {
-            storageService.deleteByfileName(course.getId() + course.getAvatarFileExtension());
+            storageService.deleteFile(course.getId() + course.getThumbnailSrc());
 
             for (ChapterEntity chapter : course.getChapters()) {
                 for (LessonEntity lesson : chapter.getLessons()) {
                     try {
-                        storageService.deleteByfileName(lesson.getId() + ".mp4");
+                        storageService.deleteFile(lesson.getId() + ".mp4");
                     } catch (Exception e) {
                         throw new StorageException("Error with removing file occurred");
                     }
@@ -99,11 +100,12 @@ public class CourseService {
         return courseMapper.fromEntityToDto(courseEntity);
     }
 
-    public Resource getCourseAvatarById(int id) {
+    // TODO : Return course thumbnail
+    public Resource getCourseThumbnailById(int id) {
         try {
             CourseEntity course = courseRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
-            return storageService.load(id + course.getAvatarFileExtension());
+            return null;
         } catch (Exception e) {
             throw new RuntimeException("Error with returning file for given lesson");
         }
