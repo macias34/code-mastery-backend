@@ -84,9 +84,10 @@ public class CourseController {
 
     @RequestMapping(method = RequestMethod.PATCH, value = "/{id}/thumbnail", consumes = {
             MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<String> updateCourseThumbnail(
+    public ResponseEntity<Void> updateCourseThumbnail(
             @PathVariable int id, @RequestParam("file") MultipartFile file) {
-        return ResponseEntity.ok(courseService.updateCourseThumbnail(id, file));
+        courseService.updateCourseThumbnail(id, file);
+        return ResponseEntity.ok().build();
     }
 
 }

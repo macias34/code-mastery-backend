@@ -108,7 +108,11 @@ public class CourseService {
     }
 
     @Transactional
-    public String updateCourseThumbnail(int id, MultipartFile file) {
+    public void updateCourseThumbnail(int id, MultipartFile file) {
+        if (!FileUtil.isImage(file)) {
+            throw new BadRequestException("Uploaded thumbnail isn't an image type.");
+        }
+
         CourseEntity courseEntity = findCourseOrThrow(id);
 
         String fileExtension = FileUtil.getFileExtension(file);
@@ -119,7 +123,6 @@ public class CourseService {
         String fileSrc = Dotenv.load().get("S3_CDN_ENDPOINT") + "/" + objectName;
         courseEntity.setThumbnailSrc(fileSrc);
 
-        return fileSrc;
     }
 
     @Transactional

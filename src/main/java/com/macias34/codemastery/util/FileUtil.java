@@ -15,4 +15,8 @@ public class FileUtil {
 		return null;
 	}
 
+	public static boolean isImage(MultipartFile file) {
+		return file.getContentType() != null && file.getContentType().startsWith("image");
+	}
+
 }
