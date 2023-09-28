@@ -74,19 +74,13 @@ public class CourseController {
         return ResponseEntity.ok(courseService.createCourse());
     }
 
-    @RequestMapping(method = RequestMethod.PATCH, value = "/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    // TODO : rename avatar to thumbnail and implement upload
+    @RequestMapping(method = RequestMethod.PATCH, value = "/{id}")
     public ResponseEntity<CourseDto> updateCourse(
-            @RequestParam(value = "avatar", required = false) MultipartFile avatar,
-            @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "price", required = false) Double price,
-            @RequestParam(value = "instructorName", required = false) String instructorName,
-            @RequestParam(value = "description", required = false) String description,
-            @RequestParam(value = "categoriesIds", required = false) Set<Integer> categoriesIds,
-            @PathVariable int id
+            @PathVariable int id, @RequestBody UpdateCourseDto updateCourseDto
 
     ) {
-        UpdateCourseDto dto = new UpdateCourseDto(name, price, instructorName, description, categoriesIds);
-        return ResponseEntity.ok(courseService.updateCourse(id, dto, avatar));
+        return ResponseEntity.ok(courseService.updateCourse(id, updateCourseDto));
     }
 
     @GetMapping("/avatar/{id}")

@@ -110,7 +110,7 @@ public class CourseService {
     }
 
     @Transactional
-    public CourseDto updateCourse(int id, UpdateCourseDto dto, MultipartFile avatar) {
+    public CourseDto updateCourse(int id, UpdateCourseDto dto) {
         DtoValidator.validate(dto);
 
         CourseEntity course = courseRepository.findById(id)
@@ -139,20 +139,7 @@ public class CourseService {
             course.setInstructorName(dto.getInstructorName());
         }
 
-        try {
-            if (avatar != null) {
-                String extension = storageService.getExtension(avatar.getOriginalFilename());
-                storageService.deleteByfileName(course.getId() + course.getAvatarFileExtension());
-                storageService.save(avatar, course.getId(), "image mimetype");
-                course.setAvatarFileExtension(extension);
-            }
-            courseRepository.save(course);
-        } catch (Exception e) {
-            if (e instanceof BadRequestException) {
-                throw e;
-            }
-            throw new StorageException("Error with saving file occurred");
-        }
+        courseRepository.save(course);
 
         return courseMapper.fromEntityToDto(course);
     }
