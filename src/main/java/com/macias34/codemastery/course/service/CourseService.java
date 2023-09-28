@@ -18,6 +18,8 @@ import com.macias34.codemastery.exception.StorageException;
 import com.macias34.codemastery.storage.service.StorageService;
 import com.macias34.codemastery.util.DateTimeUtil;
 import com.macias34.codemastery.util.DtoValidator;
+
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -27,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -41,6 +44,11 @@ public class CourseService {
     private final CategoryRepository categoryRepository;
     private final StorageService storageService;
     private final CourseMapper courseMapper;
+
+    public CourseEntity findCourseOrThrow(int id) {
+        return courseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
+    }
 
     public CourseResponseDto searchCourses(CourseFilter courseFilter, int page, int size) {
         Pageable paging = PageRequest.of(page, size);
@@ -60,16 +68,14 @@ public class CourseService {
     }
 
     public CourseDto getCourseById(int id) {
-        CourseEntity course = courseRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
+        CourseEntity course = findCourseOrThrow(id);
 
         return courseMapper.fromEntityToDto(course);
     }
 
     @Transactional
     public CourseDto deleteCourseById(int id) {
-        CourseEntity course = courseRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
+        CourseEntity course = findCourseOrThrow(id);
         try {
             storageService.deleteFile(course.getId() + course.getThumbnailSrc());
 
@@ -103,8 +109,7 @@ public class CourseService {
     // TODO : Return course thumbnail
     public Resource getCourseThumbnailById(int id) {
         try {
-            CourseEntity course = courseRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
+            CourseEntity course = findCourseOrThrow(id);
             return null;
         } catch (Exception e) {
             throw new RuntimeException("Error with returning file for given lesson");
@@ -112,11 +117,22 @@ public class CourseService {
     }
 
     @Transactional
+    public String updateCourseThumbnail(int id, MultipartFile file) {
+        findCourseOrThrow(id);
+
+        String fileName = "thumbnail-" + id;
+        storageService.uploadFile(fileName, file);
+
+        String fileSrc = Dotenv.load().get("S3_CDN_ENDPOINT") + "/" + fileName;
+
+        return fileSrc;
+    }
+
+    @Transactional
     public CourseDto updateCourse(int id, UpdateCourseDto dto) {
         DtoValidator.validate(dto);
 
-        CourseEntity course = courseRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
+        CourseEntity course = findCourseOrThrow(id);
 
         Set<CategoryEntity> categories = new HashSet<>();
 

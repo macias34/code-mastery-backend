@@ -74,13 +74,19 @@ public class CourseController {
         return ResponseEntity.ok(courseService.createCourse());
     }
 
-    // TODO : implement upload
     @RequestMapping(method = RequestMethod.PATCH, value = "/{id}")
     public ResponseEntity<CourseDto> updateCourse(
             @PathVariable int id, @RequestBody UpdateCourseDto updateCourseDto
 
     ) {
         return ResponseEntity.ok(courseService.updateCourse(id, updateCourseDto));
+    }
+
+    @RequestMapping(method = RequestMethod.PATCH, value = "/{id}/thumbnail", consumes = {
+            MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<String> updateCourseThumbnail(
+            @PathVariable int id, @RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok(courseService.updateCourseThumbnail(id, file));
     }
 
     @GetMapping("/thumbnail/{id}")

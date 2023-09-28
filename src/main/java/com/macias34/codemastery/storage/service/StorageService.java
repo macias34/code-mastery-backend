@@ -25,6 +25,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.macias34.codemastery.exception.StorageException;
 
 @Service
 public class StorageService {
@@ -46,15 +47,38 @@ public class StorageService {
 	 * @param file
 	 * @return String
 	 */
-	public void uploadFile(final String fileName, final MultipartFile file) throws IOException {
-		ObjectMetadata metadata = new ObjectMetadata();
-		metadata.setContentLength(file.getSize());
-		metadata.setContentType(contentType(file));
-
-		PutObjectResult result = amazonS3Client.putObject(bucketName, fileName, file.getInputStream(), metadata);
-
+	public void uploadFile(final String fileName, final MultipartFile file) {
+		PutObjectResult result = uploadFileToS3(fileName, file, false);
 		System.out.println("Content - Length in KB : " + result.getMetadata().getContentLength());
+	}
 
+	public void uploadPublicFile(final String fileName, final MultipartFile file) {
+		PutObjectResult result = uploadFileToS3(fileName, file, true);
+		System.out.println("Content - Length in KB : " + result.getMetadata().getContentLength());
+	}
+
+	private PutObjectResult uploadFileToS3(final String fileName, final MultipartFile file,
+			final boolean shouldBePublic) {
+		try {
+			ObjectMetadata metadata = new ObjectMetadata();
+			metadata.setContentLength(file.getSize());
+			metadata.setContentType(contentType(file));
+			if (shouldBePublic) {
+				metadata.setHeader("x-amz-acl", "public-read");
+			}
+
+			return amazonS3Client.putObject(bucketName, fileName, file.getInputStream(), metadata);
+
+		} catch (IOException ioe) {
+			System.out.println(ioe);
+			throw new StorageException(ioe.getMessage());
+		} catch (AmazonServiceException serviceException) {
+			System.out.println(serviceException);
+			throw new StorageException(serviceException.getMessage());
+		} catch (AmazonClientException clientException) {
+			System.out.println(clientException);
+			throw new StorageException(clientException.getMessage());
+		}
 	}
 
 	/**
