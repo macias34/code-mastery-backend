@@ -107,16 +107,6 @@ public class CourseService {
         return courseMapper.fromEntityToDto(courseEntity);
     }
 
-    // TODO : Return course thumbnail
-    public Resource getCourseThumbnailById(int id) {
-        try {
-            CourseEntity course = findCourseOrThrow(id);
-            return null;
-        } catch (Exception e) {
-            throw new RuntimeException("Error with returning file for given lesson");
-        }
-    }
-
     @Transactional
     public String updateCourseThumbnail(int id, MultipartFile file) {
         CourseEntity courseEntity = findCourseOrThrow(id);

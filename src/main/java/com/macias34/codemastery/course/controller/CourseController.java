@@ -89,15 +89,4 @@ public class CourseController {
         return ResponseEntity.ok(courseService.updateCourseThumbnail(id, file));
     }
 
-    @GetMapping("/thumbnail/{id}")
-    public ResponseEntity<Resource> getCourseThumbnailById(
-            @PathVariable int id) {
-        Resource image = courseService.getCourseThumbnailById(id);
-        Tika tika = new Tika();
-        String mimeType = tika.detect(image.getFilename());
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_TYPE, mimeType)
-                .body(image);
-    }
 }
