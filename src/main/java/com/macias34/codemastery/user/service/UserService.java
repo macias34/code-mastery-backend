@@ -8,9 +8,11 @@ import com.macias34.codemastery.exception.NoPermissionException;
 import com.macias34.codemastery.exception.ResourceAlreadyExistsException;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
 import com.macias34.codemastery.exception.WrongCredentialsException;
+import com.macias34.codemastery.mail.service.MailService;
 import com.macias34.codemastery.user.dto.InvoiceDetailsDto;
 import com.macias34.codemastery.user.dto.PasswordChangeDto;
 import com.macias34.codemastery.user.dto.PersonalDetailsDto;
+import com.macias34.codemastery.user.dto.ResetPasswordDto;
 import com.macias34.codemastery.user.dto.UpdateInvoiceDetailsDto;
 import com.macias34.codemastery.user.dto.UpdatePersonalDetailsDto;
 import com.macias34.codemastery.user.dto.UpdateUserDto;
@@ -31,6 +33,7 @@ import com.macias34.codemastery.user.repository.InvoiceDetailsRepository;
 import com.macias34.codemastery.user.repository.PersonalDetailsRepository;
 import com.macias34.codemastery.user.repository.UserRepository;
 import com.macias34.codemastery.util.DtoValidator;
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
@@ -70,6 +73,8 @@ public class UserService {
     private InvoiceDetailsService invoiceDetailsService;
 
     private PasswordEncoder passwordEncoder;
+
+    private MailService mailService;
 
     public UserResponseDto getAllUsers(UserFilter userFilter, int page, int size) {
         Specification<UserEntity> spec = UserSpecification.withFilters(userFilter);
@@ -182,7 +187,7 @@ public class UserService {
         ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
         if (token == null) {
             throw new ResourceNotFoundException(
-                    String.format(CONFIRMATION_TOKEN_DOESNT_EXIST_MESSAGE, confirmationToken));
+                    String.format(USER_DOESNT_EXIST_MESSAGE, confirmationToken));
         }
 
         UserEntity user = userRepository.findByEmailIgnoreCase(token.getEmail());
@@ -191,6 +196,36 @@ public class UserService {
         userRepository.save(user);
 
     };
+
+    public void sendPasswordResetLink(String email) {
+        ConfirmationToken token = confirmationTokenRepository.findByEmail(email);
+
+        if (token == null) {
+            throw new ResourceNotFoundException(
+                    String.format(USER_DOESNT_EXIST_MESSAGE, email));
+        }
+
+        String hostUrl = Dotenv.load().get("FRONTEND_URL");
+        String passwordResetUrl = hostUrl + "/auth/reset-password?token="
+                + token.getConfirmationToken();
+
+        String mailMessage = "Click this link to reset your password: " + passwordResetUrl;
+
+        mailService.sendMail("Reset your password", mailMessage, email);
+    }
+
+    public void resetPassword(String confirmationToken, ResetPasswordDto dto) {
+        ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
+        if (token == null) {
+            throw new ResourceNotFoundException(
+                    String.format(CONFIRMATION_TOKEN_DOESNT_EXIST_MESSAGE, confirmationToken));
+        }
+
+        UserEntity user = userRepository.findByEmailIgnoreCase(token.getEmail());
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+
+        userRepository.save(user);
+    }
 
 
     public void checkIfUserExists(SignUpDto signUpDto) throws ResourceAlreadyExistsException {
@@ -219,6 +254,7 @@ public class UserService {
                     String.format(USER_NOT_CONFIRMED_EMAIL_MESSAGE, signInDto.getUsername()));
         }
     }
+
 
 
 }

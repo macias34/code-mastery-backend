@@ -6,4 +6,5 @@ import com.macias34.codemastery.user.entity.ConfirmationToken;
 
 public interface ConfirmationTokenRepository extends JpaRepository<ConfirmationToken, Integer> {
 	ConfirmationToken findByConfirmationToken(String confirmationToken);
+	ConfirmationToken findByEmail(String email);
 }
