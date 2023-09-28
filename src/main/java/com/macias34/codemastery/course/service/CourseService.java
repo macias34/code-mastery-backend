@@ -18,6 +18,7 @@ import com.macias34.codemastery.exception.StorageException;
 import com.macias34.codemastery.storage.service.StorageService;
 import com.macias34.codemastery.util.DateTimeUtil;
 import com.macias34.codemastery.util.DtoValidator;
+import com.macias34.codemastery.util.FileUtil;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.transaction.Transactional;
@@ -118,12 +119,15 @@ public class CourseService {
 
     @Transactional
     public String updateCourseThumbnail(int id, MultipartFile file) {
-        findCourseOrThrow(id);
+        CourseEntity courseEntity = findCourseOrThrow(id);
 
+        String fileExtension = FileUtil.getFileExtension(file);
         String fileName = "thumbnail-" + id;
-        storageService.uploadFile(fileName, file);
+        String objectName = "public/thumbnails/" + fileName + fileExtension;
+        storageService.uploadPublicFile(objectName, file);
 
-        String fileSrc = Dotenv.load().get("S3_CDN_ENDPOINT") + "/" + fileName;
+        String fileSrc = Dotenv.load().get("S3_CDN_ENDPOINT") + "/" + objectName;
+        courseEntity.setThumbnailSrc(fileSrc);
 
         return fileSrc;
     }
