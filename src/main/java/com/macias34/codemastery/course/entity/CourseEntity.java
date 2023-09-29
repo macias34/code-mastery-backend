@@ -2,6 +2,7 @@ package com.macias34.codemastery.course.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.macias34.codemastery.order.entity.OrderEntity;
+import com.macias34.codemastery.storage.entity.StorageFile;
 import com.macias34.codemastery.user.entity.UserEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -58,7 +59,7 @@ public class CourseEntity {
     private Timestamp updatedAt;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "thumbnail_id", referencedColumnName = "id")
+    @JoinColumn(name = "thumbnail_id")
     private ThumbnailEntity thumbnail;
 
     @ManyToMany(fetch = FetchType.LAZY)

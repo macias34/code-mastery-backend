@@ -17,6 +17,7 @@ import com.macias34.codemastery.course.repository.ThumbnailRepository;
 import com.macias34.codemastery.exception.BadRequestException;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
 import com.macias34.codemastery.exception.StorageException;
+import com.macias34.codemastery.storage.entity.StorageFile;
 import com.macias34.codemastery.storage.service.StorageService;
 import com.macias34.codemastery.util.DateTimeUtil;
 import com.macias34.codemastery.util.DtoValidator;
@@ -116,19 +117,19 @@ public class CourseService {
             throw new BadRequestException("Uploaded thumbnail isn't an image type.");
         }
 
-        CourseEntity courseEntity = findCourseOrThrow(id);
+        CourseEntity course = findCourseOrThrow(id);
 
         String fileExtension = FileUtil.getFileExtension(file);
         String fileName = "thumbnail-" + id;
         String objectName = "public/thumbnails/" + fileName + fileExtension;
-        storageService.uploadPublicFile(objectName, file);
+        StorageFile storageFile = storageService.uploadPublicFile(fileName, objectName, file);
 
-        String fileSrc = Dotenv.load().get("S3_CDN_ENDPOINT") + "/" + objectName;
+        ThumbnailEntity thumbnailEntity = new ThumbnailEntity(storageFile.getSrc(), storageFile.getFileName(),
+                storageFile.getObjectName(), course);
 
-        ThumbnailEntity thumbnailEntity = new ThumbnailEntity(fileSrc, objectName, courseEntity);
         thumbnailRepository.save(thumbnailEntity);
 
-        courseEntity.setThumbnail(thumbnailEntity);
+        course.setThumbnail(thumbnailEntity);
     }
 
     @Transactional

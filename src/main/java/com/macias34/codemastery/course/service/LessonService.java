@@ -5,14 +5,20 @@ import com.macias34.codemastery.course.dto.lesson.LessonDto;
 import com.macias34.codemastery.course.dto.lesson.UpdateLessonDto;
 import com.macias34.codemastery.course.entity.ChapterEntity;
 import com.macias34.codemastery.course.entity.LessonEntity;
+import com.macias34.codemastery.course.entity.ThumbnailEntity;
+import com.macias34.codemastery.course.entity.VideoEntity;
 import com.macias34.codemastery.course.mapper.LessonMapper;
 import com.macias34.codemastery.course.repository.ChapterRepository;
 import com.macias34.codemastery.course.repository.LessonRepository;
+import com.macias34.codemastery.course.repository.VideoRepository;
 import com.macias34.codemastery.exception.BadRequestException;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
 import com.macias34.codemastery.exception.StorageException;
+import com.macias34.codemastery.storage.entity.StorageFile;
 import com.macias34.codemastery.storage.service.StorageService;
 import com.macias34.codemastery.util.DtoValidator;
+import com.macias34.codemastery.util.FileUtil;
+
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
@@ -29,6 +35,7 @@ import java.util.List;
 public class LessonService {
     private final LessonRepository lessonRepository;
     private final ChapterRepository chapterRepository;
+    private final VideoRepository videoRepository;
     private final LessonMapper lessonMapper;
 
     private final StorageService storageService;
@@ -46,9 +53,19 @@ public class LessonService {
         chapter.setLessons(lessons);
 
         try {
-            lessonRepository.save(lesson);
-            storageService.uploadFile(lesson.getId() + ".mp4", file);
-            chapterRepository.save(chapter);
+
+            String fileExtension = FileUtil.getFileExtension(file);
+            String fileName = "chapter-" + chapter.getId() + "-lesson-" + lesson.getId();
+            String objectName = "protected/lessons/" + fileName + fileExtension;
+
+            StorageFile storageFile = storageService.uploadPublicFile(fileName, objectName, file);
+
+            VideoEntity videoEntity = new VideoEntity(storageFile.getSrc(), storageFile.getFileName(),
+                    storageFile.getObjectName(), lesson);
+
+            videoRepository.save(videoEntity);
+            lesson.setVideo(videoEntity);
+
         } catch (Exception e) {
             lessonRepository.deleteById(lesson.getId());
             if (e instanceof BadRequestException) {
@@ -56,6 +73,10 @@ public class LessonService {
             }
             throw new StorageException("Error with saving file occured");
         }
+
+        lessonRepository.save(lesson);
+        chapterRepository.save(chapter);
+
         return lessonMapper.fromEntityToDto(lesson);
     }
 

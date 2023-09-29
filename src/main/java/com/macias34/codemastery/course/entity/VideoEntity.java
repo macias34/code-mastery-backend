@@ -13,20 +13,20 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "thumbnail")
+@Table(name = "video")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ThumbnailEntity extends StorageFile {
+public class VideoEntity extends StorageFile {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@OneToOne(mappedBy = "thumbnail")
-	private CourseEntity course;
+	@OneToOne(mappedBy = "video")
+	private LessonEntity lesson;
 
-	public ThumbnailEntity(String src, String fileName, String objectName, CourseEntity course) {
+	public VideoEntity(String src, String fileName, String objectName, LessonEntity lesson) {
 		super(src, fileName, objectName);
-		this.course = course;
+		this.lesson = lesson;
 	}
 }

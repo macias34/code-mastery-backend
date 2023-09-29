@@ -26,6 +26,9 @@ import com.amazonaws.services.s3.model.PutObjectResult;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.macias34.codemastery.exception.StorageException;
+import com.macias34.codemastery.storage.entity.StorageFile;
+
+import io.github.cdimascio.dotenv.Dotenv;
 
 @Service
 public class StorageService {
@@ -47,17 +50,16 @@ public class StorageService {
 	 * @param file
 	 * @return String
 	 */
-	public void uploadFile(final String fileName, final MultipartFile file) {
-		PutObjectResult result = uploadFileToS3(fileName, file, false);
-		System.out.println("Content - Length in KB : " + result.getMetadata().getContentLength());
+	public StorageFile uploadFile(final String fileName, final String objectName, final MultipartFile file) {
+
+		return uploadFileToS3(fileName, objectName, file, false);
 	}
 
-	public void uploadPublicFile(final String fileName, final MultipartFile file) {
-		PutObjectResult result = uploadFileToS3(fileName, file, true);
-		System.out.println("Content - Length in KB : " + result.getMetadata().getContentLength());
+	public StorageFile uploadPublicFile(final String fileName, final String objectName, final MultipartFile file) {
+		return uploadFileToS3(fileName, objectName, file, true);
 	}
 
-	private PutObjectResult uploadFileToS3(final String fileName, final MultipartFile file,
+	private StorageFile uploadFileToS3(final String fileName, final String objectName, final MultipartFile file,
 			final boolean shouldBePublic) {
 		try {
 			ObjectMetadata metadata = new ObjectMetadata();
@@ -67,7 +69,10 @@ public class StorageService {
 				metadata.setHeader("x-amz-acl", "public-read");
 			}
 
-			return amazonS3Client.putObject(bucketName, fileName, file.getInputStream(), metadata);
+			amazonS3Client.putObject(bucketName, objectName, file.getInputStream(), metadata);
+
+			String src = Dotenv.load().get("S3_CDN_ENDPOINT") + "/" + objectName;
+			return new StorageFile(src, fileName, objectName);
 
 		} catch (IOException ioe) {
 			System.out.println(ioe);
