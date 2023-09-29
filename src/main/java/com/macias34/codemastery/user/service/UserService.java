@@ -113,8 +113,6 @@ public class UserService {
             throw new NoPermissionException("You cannot update others' user data");
         }
 
-
-
         if (dto.getPersonalDetails() != null) {
             UpdatePersonalDetailsDto personalDetailsDto = dto.getPersonalDetails();
             DtoValidator.validate(personalDetailsDto);
@@ -154,7 +152,7 @@ public class UserService {
         DtoValidator.validate(dto);
 
         if (dto.getUsername() != null) {
-            if(!loggedUserUsername.equals(dto.getUsername())){
+            if (!loggedUserUsername.equals(dto.getUsername())) {
                 checkIfUserExists(SignUpDto.builder().username(dto.getUsername()).build());
             }
             user.setUsername(dto.getUsername());
@@ -165,14 +163,14 @@ public class UserService {
         }
 
         if (dto.getEmail() != null) {
-            if(!loggedUser.getEmail().equals(dto.getEmail())){
+            if (!loggedUser.getEmail().equals(dto.getEmail())) {
                 checkIfUserExists(SignUpDto.builder().email(dto.getEmail()).build());
             }
             user.setEmail(dto.getEmail());
         }
 
         if (dto.getNote() != null) {
-            if(loggedUser.getRole() == UserRole.USER){
+            if (loggedUser.getRole() == UserRole.USER) {
                 throw new NoPermissionException("You cannot add note for user");
             }
             user.setNote(dto.getNote());
@@ -224,9 +222,9 @@ public class UserService {
         UserEntity user = userRepository.findByEmailIgnoreCase(token.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
 
+        confirmationTokenRepository.delete(token);
         userRepository.save(user);
     }
-
 
     public void checkIfUserExists(SignUpDto signUpDto) throws ResourceAlreadyExistsException {
         if (userRepository.existsByUsername(signUpDto.getUsername())) {
@@ -254,7 +252,5 @@ public class UserService {
                     String.format(USER_NOT_CONFIRMED_EMAIL_MESSAGE, signInDto.getUsername()));
         }
     }
-
-
 
 }
