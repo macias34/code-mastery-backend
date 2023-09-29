@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.macias34.codemastery.auth.service.AuthService;
 import com.macias34.codemastery.user.dto.PasswordChangeDto;
+import com.macias34.codemastery.user.dto.ResetPasswordDto;
 import com.macias34.codemastery.user.dto.UpdateUserDto;
 import com.macias34.codemastery.user.dto.UserDto;
 import com.macias34.codemastery.user.dto.UserResponseDto;
@@ -23,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -101,6 +103,20 @@ public class UserController {
 			System.out.println(exception);
 		}
 
+		return ResponseEntity.ok().build();
+	}
+
+	@PostMapping("/reset-password")
+	public ResponseEntity<?> resetPassword(@RequestParam("token") String confirmationToken,
+										   @RequestBody ResetPasswordDto dto) {
+
+		userService.resetPassword(confirmationToken,dto);
+		return ResponseEntity.ok().build();
+	}
+
+	@PostMapping("/send-reset-password-link")
+	public ResponseEntity<?> sendPasswordResetLink(@RequestParam("email") String email) {
+		userService.sendPasswordResetLink(email);
 		return ResponseEntity.ok().build();
 	}
 
