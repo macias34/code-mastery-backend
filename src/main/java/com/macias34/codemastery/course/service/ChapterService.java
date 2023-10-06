@@ -33,7 +33,7 @@ public class ChapterService {
 
         CourseEntity course = courseRepository.findById(dto.getCourseId())
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
-        ChapterEntity chapter = new ChapterEntity(dto.getName(), course);
+        ChapterEntity chapter = new ChapterEntity(dto.getTitle(), course);
 
         List<ChapterEntity> courseChapters = course.getChapters();
         courseChapters.add(chapter);
@@ -85,7 +85,7 @@ public class ChapterService {
         ChapterEntity chapter = chapterRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Chapter not found"));
 
-        chapter.setName(dto.getName());
+        chapter.setTitle(dto.getTitle());
 
         return chapterMapper.fromEntityToDto(chapter);
     }

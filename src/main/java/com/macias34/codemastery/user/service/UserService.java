@@ -222,7 +222,6 @@ public class UserService {
         UserEntity user = userRepository.findByEmailIgnoreCase(token.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
 
-        confirmationTokenRepository.delete(token);
         userRepository.save(user);
     }
 
