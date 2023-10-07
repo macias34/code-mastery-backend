@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 public class ChapterDto {
     private int id;
-    private String name;
+    private String title;
     private Timestamp createdAt;
     private Timestamp updatedAt;
     private List<LessonDto> lessons;

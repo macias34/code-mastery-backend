@@ -25,7 +25,7 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<List<CategoryDto>> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
@@ -36,7 +36,7 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getCategoryById(id));
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<CategoryDto> createCategory(
             @RequestBody CategoryRequestDto dto) {
         return ResponseEntity.ok(categoryService.createCategory(dto));

@@ -42,7 +42,7 @@ public class CourseController {
     private CourseRepository courseRepository;
     private CustomUserDetailsService customUserDetailsService;
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<CourseResponseDto> searchCourses(
             @RequestParam(required = false) String name,
             @RequestParam(defaultValue = "0") Double minPrice,

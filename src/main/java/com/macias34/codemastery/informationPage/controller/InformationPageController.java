@@ -26,7 +26,7 @@ import java.util.List;
 public class InformationPageController {
     private final InformationPageService informationPageService;
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<List<InformationPageDto>> getAllInformationPages() {
         return ResponseEntity.ok(informationPageService.getAllInformationPages());
     }

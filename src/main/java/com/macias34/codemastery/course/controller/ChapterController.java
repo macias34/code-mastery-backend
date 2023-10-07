@@ -45,7 +45,7 @@ public class ChapterController {
         return ResponseEntity.ok(chapterService.deleteChapterById(id));
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<ChapterDto> createChapter(
             @RequestBody CreateChapterDto dto) {
         return ResponseEntity.ok(chapterService.createChapter(dto));
