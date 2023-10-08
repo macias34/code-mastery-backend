@@ -3,6 +3,7 @@ package com.macias34.codemastery.storage.service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,12 +18,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectResult;
+import com.amazonaws.services.s3.model.ResponseHeaderOverrides;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.macias34.codemastery.exception.StorageException;
@@ -154,4 +158,39 @@ public class StorageService {
 		return file.getContentType() == null ? fileName.substring(fileName.lastIndexOf(".") + 1)
 				: file.getContentType();
 	}
+
+	/**
+	 * Generate a presigned URL for a file stored in DigitalOcean Spaces.
+	 *
+	 * @param objectName          The name of the object (file) in the bucket.
+	 * @param expirationInMinutes The expiration time for the presigned URL in
+	 *                            minutes.
+	 * @return The presigned URL.
+	 */
+	public URL generatePresignedUrl(String objectName, int expirationInMinutes) {
+		try {
+			// Calculate the expiration date for the presigned URL
+			Date expiration = new Date(System.currentTimeMillis() + (expirationInMinutes * 60 * 1000));
+
+			// Create a request to generate the presigned URL
+			GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(bucketName,
+					objectName)
+					.withMethod(HttpMethod.GET)
+					.withExpiration(expiration);
+
+			// Optional: Customize the response headers for the presigned URL (e.g., to set
+			// Content-Disposition)
+			ResponseHeaderOverrides responseHeaders = new ResponseHeaderOverrides()
+					.withContentDisposition("inline");
+			generatePresignedUrlRequest.setResponseHeaders(responseHeaders);
+
+			// Generate the presigned URL
+			URL presignedUrl = amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
+
+			return presignedUrl;
+		} catch (Exception e) {
+			throw new StorageException("Error generating presigned URL: " + e.getMessage());
+		}
+	}
+
 }

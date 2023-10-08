@@ -37,6 +37,7 @@ public class LessonService {
     private final LessonRepository lessonRepository;
     private final ChapterRepository chapterRepository;
     private final VideoRepository videoRepository;
+    private final VideoService videoService;
     private final LessonMapper lessonMapper;
 
     private final StorageService storageService;
@@ -69,13 +70,13 @@ public class LessonService {
 
             VideoEntity previousVideo = lesson.getVideo();
 
-            StorageFile storageFile = storageService.uploadPublicFile(fileName, objectName, file);
+            StorageFile storageFile = storageService.uploadFile(fileName, objectName, file);
 
             VideoEntity video = new VideoEntity(storageFile.getSrc(), storageFile.getFileName(),
                     storageFile.getObjectName(), lesson);
 
             lesson.setVideo(video);
-            deleteLessonVideoIfExists(previousVideo);
+            videoService.deleteLessonVideoIfExists(previousVideo);
 
         } catch (Exception e) {
             if (e instanceof BadRequestException) {
@@ -87,13 +88,6 @@ public class LessonService {
         lessonRepository.save(lesson);
 
         return lessonMapper.fromEntityToDto(lesson);
-    }
-
-    private void deleteLessonVideoIfExists(VideoEntity previousVideo) {
-        if (previousVideo != null) {
-            videoRepository.delete(previousVideo);
-            storageService.deleteFile(previousVideo.getObjectName());
-        }
     }
 
     public LessonDto deleteLessonById(int id) {
@@ -141,12 +135,4 @@ public class LessonService {
         return lessons.stream().map(lessonMapper::fromEntityToDto).toList();
     }
 
-    // TODO: return lesson URL
-    public Resource getLessonFileById(int id) {
-        try {
-            return null;
-        } catch (Exception e) {
-            throw new RuntimeException("Error with returning file for given lesson");
-        }
-    }
 }
