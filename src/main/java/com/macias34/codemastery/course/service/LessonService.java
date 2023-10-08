@@ -1,9 +1,11 @@
 package com.macias34.codemastery.course.service;
 
+import com.macias34.codemastery.course.dto.course.CourseDto;
 import com.macias34.codemastery.course.dto.lesson.CreateLessonDto;
 import com.macias34.codemastery.course.dto.lesson.LessonDto;
 import com.macias34.codemastery.course.dto.lesson.UpdateLessonDto;
 import com.macias34.codemastery.course.entity.ChapterEntity;
+import com.macias34.codemastery.course.entity.CourseEntity;
 import com.macias34.codemastery.course.entity.LessonEntity;
 import com.macias34.codemastery.course.entity.ThumbnailEntity;
 import com.macias34.codemastery.course.entity.VideoEntity;
@@ -14,8 +16,13 @@ import com.macias34.codemastery.course.repository.VideoRepository;
 import com.macias34.codemastery.exception.BadRequestException;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
 import com.macias34.codemastery.exception.StorageException;
+import com.macias34.codemastery.security.jwt.JwtGenerator;
 import com.macias34.codemastery.storage.entity.StorageFile;
 import com.macias34.codemastery.storage.service.StorageService;
+import com.macias34.codemastery.user.dto.UserDto;
+import com.macias34.codemastery.user.entity.UserEntity;
+import com.macias34.codemastery.user.entity.UserRole;
+import com.macias34.codemastery.user.service.UserService;
 import com.macias34.codemastery.util.DtoValidator;
 import com.macias34.codemastery.util.FileUtil;
 
@@ -24,10 +31,12 @@ import lombok.AllArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,11 +45,10 @@ import java.util.UUID;
 public class LessonService {
     private final LessonRepository lessonRepository;
     private final ChapterRepository chapterRepository;
-    private final VideoRepository videoRepository;
     private final VideoService videoService;
     private final LessonMapper lessonMapper;
-
     private final StorageService storageService;
+    private final UserService userService;
 
     @Transactional
     public LessonDto createLesson(CreateLessonDto dto) {
@@ -117,7 +125,45 @@ public class LessonService {
     }
 
     public LessonDto getLessonById(int id) {
-        return lessonMapper.fromEntityToDto(getLessonEntityById(id));
+        LessonEntity lesson = getLessonEntityById(id);
+        LessonDto lessonDto = lessonMapper.fromEntityToDto(lesson);
+        VideoEntity video = lesson.getVideo();
+
+        if (video != null) {
+
+            UserDetails sessionUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
+                    .getPrincipal();
+            UserDto user = userService.getUserByUsername(sessionUser.getUsername());
+
+            boolean isUserAuthorizedForCourse = checkIfUserIsAuthorizedForCourse(user, lesson);
+
+            if (isUserAuthorizedForCourse) {
+                String videoPresignedUrl = storageService.generatePresignedUrl(video.getObjectName(), 10).toString();
+                lessonDto.setVideoSrc(videoPresignedUrl);
+            }
+
+        }
+
+        return lessonDto;
+    }
+
+    private boolean checkIfUserIsAuthorizedForCourse(UserDto user, LessonEntity lesson) {
+        boolean isUserAuthorizedForCourse = false;
+
+        if (user.getRole().equals(UserRole.ADMIN)) {
+            isUserAuthorizedForCourse = true;
+        }
+
+        else {
+            for (CourseDto course : user.getCourses()) {
+                if (course.getId() == lesson.getChapter().getCourse().getId()) {
+                    isUserAuthorizedForCourse = true;
+                    break;
+                }
+            }
+        }
+
+        return isUserAuthorizedForCourse;
     }
 
     private LessonEntity getLessonEntityById(int id) {

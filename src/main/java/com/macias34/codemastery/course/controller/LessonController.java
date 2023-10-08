@@ -40,16 +40,6 @@ public class LessonController {
         return ResponseEntity.ok(lessonService.getLessonById(id));
     }
 
-    // @GetMapping("/file/{id}")
-    // public ResponseEntity<Resource> getLessonFileById(
-    // @PathVariable int id) {
-    // // TODO Check if user bought course
-    // Resource resource = lessonService.getLessonById(id);
-    // return ResponseEntity.ok()
-    // .header(HttpHeaders.CONTENT_TYPE, "video/mp4") // Displaying file
-    // .body(resource);
-    // }
-
     @GetMapping("/chapter/{id}")
     public ResponseEntity<List<LessonDto>> getLessonsByChapterId(
             @PathVariable int id) {

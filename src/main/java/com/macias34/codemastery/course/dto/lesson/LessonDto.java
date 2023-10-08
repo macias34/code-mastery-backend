@@ -13,4 +13,5 @@ public class LessonDto {
     private int chapterId;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    private String videoSrc;
 }
