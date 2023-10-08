@@ -46,7 +46,7 @@ public class LessonService {
 
         ChapterEntity chapter = chapterRepository.findById(dto.getChapterId())
                 .orElseThrow(() -> new ResourceNotFoundException("Chapter not found"));
-        LessonEntity lesson = new LessonEntity(dto.getName(), chapter);
+        LessonEntity lesson = new LessonEntity(dto.getTitle(), chapter);
 
         List<LessonEntity> lessons = chapter.getLessons();
         lessons.add(lesson);
@@ -100,7 +100,7 @@ public class LessonService {
         LessonEntity lesson = lessonRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
 
-        lesson.setName(dto.getName());
+        lesson.setTitle(dto.getTitle());
         lessonRepository.save(lesson);
 
         return lessonMapper.fromEntityToDto(lesson);

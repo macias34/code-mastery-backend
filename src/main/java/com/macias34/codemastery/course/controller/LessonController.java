@@ -68,8 +68,8 @@ public class LessonController {
             // All RequestParam which are part of dto has required=false in order to get
             // validated by DtoValidator
             @RequestParam(value = "chapterId", required = false) int chapterId,
-            @RequestParam(value = "name", required = false) String name) {
-        CreateLessonDto dto = new CreateLessonDto(name, chapterId);
+            @RequestParam(value = "title", required = false) String title) {
+        CreateLessonDto dto = new CreateLessonDto(title, chapterId);
         return ResponseEntity.ok(lessonService.createLesson(dto, file));
     }
 

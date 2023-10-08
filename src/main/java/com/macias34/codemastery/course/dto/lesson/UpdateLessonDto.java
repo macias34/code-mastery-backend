@@ -10,5 +10,5 @@ import lombok.Setter;
 @Setter
 public class UpdateLessonDto {
     @NotNull
-    private String name;
+    private String title;
 }

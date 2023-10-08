@@ -32,7 +32,7 @@ public class LessonEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String name;
+    private String title;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chapter_id", referencedColumnName = "id")
@@ -49,8 +49,8 @@ public class LessonEntity {
     @JoinColumn(name = "video_id")
     private VideoEntity video;
 
-    public LessonEntity(String name, ChapterEntity chapter) {
-        this.name = name;
+    public LessonEntity(String title, ChapterEntity chapter) {
+        this.title = title;
         this.chapter = chapter;
     }
 }
