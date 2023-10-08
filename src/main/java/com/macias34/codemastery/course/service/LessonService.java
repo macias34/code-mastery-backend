@@ -5,22 +5,17 @@ import com.macias34.codemastery.course.dto.lesson.CreateLessonDto;
 import com.macias34.codemastery.course.dto.lesson.LessonDto;
 import com.macias34.codemastery.course.dto.lesson.UpdateLessonDto;
 import com.macias34.codemastery.course.entity.ChapterEntity;
-import com.macias34.codemastery.course.entity.CourseEntity;
 import com.macias34.codemastery.course.entity.LessonEntity;
-import com.macias34.codemastery.course.entity.ThumbnailEntity;
 import com.macias34.codemastery.course.entity.VideoEntity;
 import com.macias34.codemastery.course.mapper.LessonMapper;
 import com.macias34.codemastery.course.repository.ChapterRepository;
 import com.macias34.codemastery.course.repository.LessonRepository;
-import com.macias34.codemastery.course.repository.VideoRepository;
 import com.macias34.codemastery.exception.BadRequestException;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
 import com.macias34.codemastery.exception.StorageException;
-import com.macias34.codemastery.security.jwt.JwtGenerator;
 import com.macias34.codemastery.storage.entity.StorageFile;
 import com.macias34.codemastery.storage.service.StorageService;
 import com.macias34.codemastery.user.dto.UserDto;
-import com.macias34.codemastery.user.entity.UserEntity;
 import com.macias34.codemastery.user.entity.UserRole;
 import com.macias34.codemastery.user.service.UserService;
 import com.macias34.codemastery.util.DtoValidator;
@@ -29,9 +24,6 @@ import com.macias34.codemastery.util.FileUtil;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -138,7 +130,7 @@ public class LessonService {
             boolean isUserAuthorizedForCourse = checkIfUserIsAuthorizedForCourse(user, lesson);
 
             if (isUserAuthorizedForCourse) {
-                String videoPresignedUrl = storageService.generatePresignedUrl(video.getObjectName(), 10).toString();
+                String videoPresignedUrl = storageService.generatePresignedUrl(video.getObjectName(), 1).toString();
                 lessonDto.setVideoSrc(videoPresignedUrl);
             }
 
