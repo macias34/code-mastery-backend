@@ -29,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
 @Service
@@ -41,21 +42,24 @@ public class LessonService {
     private final StorageService storageService;
 
     @Transactional
-    public LessonDto createLesson(CreateLessonDto dto, MultipartFile file) {
+    public LessonDto createLesson(CreateLessonDto dto) {
         DtoValidator.validate(dto);
 
         ChapterEntity chapter = chapterRepository.findById(dto.getChapterId())
                 .orElseThrow(() -> new ResourceNotFoundException("Chapter not found"));
         LessonEntity lesson = new LessonEntity(dto.getTitle(), chapter);
 
-        List<LessonEntity> lessons = chapter.getLessons();
-        lessons.add(lesson);
-        chapter.setLessons(lessons);
+        lessonRepository.save(lesson);
+
+        return lessonMapper.fromEntityToDto(lesson);
+    }
+
+    public LessonDto uploadLessonVideo(int id, MultipartFile file) {
+        LessonEntity lesson = getLessonEntityById(id);
 
         try {
-
             String fileExtension = FileUtil.getFileExtension(file);
-            String fileName = "chapter-" + chapter.getId() + "-lesson-" + lesson.getId();
+            String fileName = UUID.randomUUID().toString();
             String objectName = "protected/lessons/" + fileName + fileExtension;
 
             StorageFile storageFile = storageService.uploadPublicFile(fileName, objectName, file);
@@ -75,7 +79,6 @@ public class LessonService {
         }
 
         lessonRepository.save(lesson);
-        chapterRepository.save(chapter);
 
         return lessonMapper.fromEntityToDto(lesson);
     }
@@ -111,6 +114,13 @@ public class LessonService {
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
 
         return lessonMapper.fromEntityToDto(lesson);
+    }
+
+    private LessonEntity getLessonEntityById(int id) {
+        LessonEntity lesson = lessonRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
+
+        return lesson;
     }
 
     public List<LessonDto> getLessonsByChapterId(int chapterId) {

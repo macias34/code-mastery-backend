@@ -62,15 +62,18 @@ public class LessonController {
         return ResponseEntity.ok(lessonService.deleteLessonById(id));
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PostMapping("")
     public ResponseEntity<LessonDto> createLesson(
+            @RequestBody CreateLessonDto dto) {
+        return ResponseEntity.ok(lessonService.createLesson(dto));
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<LessonDto> uploadLessonVideo(
             @RequestParam("file") MultipartFile file,
-            // All RequestParam which are part of dto has required=false in order to get
-            // validated by DtoValidator
-            @RequestParam(value = "chapterId", required = false) int chapterId,
+            @RequestParam(value = "lessonId", required = false) int lessonId,
             @RequestParam(value = "title", required = false) String title) {
-        CreateLessonDto dto = new CreateLessonDto(title, chapterId);
-        return ResponseEntity.ok(lessonService.createLesson(dto, file));
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{id}")
