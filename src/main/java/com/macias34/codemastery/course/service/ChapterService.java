@@ -85,6 +85,7 @@ public class ChapterService {
                 .orElseThrow(() -> new ResourceNotFoundException("Chapter not found"));
 
         chapter.setTitle(dto.getTitle());
+        chapterRepository.save(chapter);
 
         return chapterMapper.fromEntityToDto(chapter);
     }
