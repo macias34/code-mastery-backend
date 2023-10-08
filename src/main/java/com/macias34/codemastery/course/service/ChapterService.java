@@ -39,7 +39,6 @@ public class ChapterService {
         courseChapters.add(chapter);
         course.setChapters(courseChapters);
 
-        courseRepository.save(course);
         chapterRepository.save(chapter);
 
         return chapterMapper.fromEntityToDto(chapter);
