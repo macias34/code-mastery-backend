@@ -57,21 +57,27 @@ public class LessonService {
     public LessonDto uploadLessonVideo(int id, MultipartFile file) {
         LessonEntity lesson = getLessonEntityById(id);
 
+        if (!FileUtil.isVideo(file)) {
+            throw new BadRequestException("Uploaded video isn't a video type.");
+        }
+
         try {
+
             String fileExtension = FileUtil.getFileExtension(file);
-            String fileName = UUID.randomUUID().toString();
-            String objectName = "protected/lessons/" + fileName + fileExtension;
+            String fileName = UUID.randomUUID().toString() + fileExtension;
+            String objectName = "protected/lessons/" + fileName;
+
+            VideoEntity previousVideo = lesson.getVideo();
 
             StorageFile storageFile = storageService.uploadPublicFile(fileName, objectName, file);
 
-            VideoEntity videoEntity = new VideoEntity(storageFile.getSrc(), storageFile.getFileName(),
+            VideoEntity video = new VideoEntity(storageFile.getSrc(), storageFile.getFileName(),
                     storageFile.getObjectName(), lesson);
 
-            videoRepository.save(videoEntity);
-            lesson.setVideo(videoEntity);
+            lesson.setVideo(video);
+            deleteLessonVideoIfExists(previousVideo);
 
         } catch (Exception e) {
-            lessonRepository.deleteById(lesson.getId());
             if (e instanceof BadRequestException) {
                 System.out.println(e);
             }
@@ -81,6 +87,13 @@ public class LessonService {
         lessonRepository.save(lesson);
 
         return lessonMapper.fromEntityToDto(lesson);
+    }
+
+    private void deleteLessonVideoIfExists(VideoEntity previousVideo) {
+        if (previousVideo != null) {
+            videoRepository.delete(previousVideo);
+            storageService.deleteFile(previousVideo.getObjectName());
+        }
     }
 
     public LessonDto deleteLessonById(int id) {
@@ -110,10 +123,7 @@ public class LessonService {
     }
 
     public LessonDto getLessonById(int id) {
-        LessonEntity lesson = lessonRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
-
-        return lessonMapper.fromEntityToDto(lesson);
+        return lessonMapper.fromEntityToDto(getLessonEntityById(id));
     }
 
     private LessonEntity getLessonEntityById(int id) {

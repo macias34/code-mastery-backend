@@ -68,12 +68,13 @@ public class LessonController {
         return ResponseEntity.ok(lessonService.createLesson(dto));
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @RequestMapping(method = RequestMethod.POST, value = "/upload-video", consumes = {
+            MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<LessonDto> uploadLessonVideo(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "lessonId", required = false) int lessonId,
             @RequestParam(value = "title", required = false) String title) {
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(lessonService.uploadLessonVideo(lessonId, file));
     }
 
     @PatchMapping("/{id}")

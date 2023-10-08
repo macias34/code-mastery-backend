@@ -19,4 +19,8 @@ public class FileUtil {
 		return file.getContentType() != null && file.getContentType().startsWith("image");
 	}
 
+	public static boolean isVideo(MultipartFile file) {
+		return file.getContentType() != null && file.getContentType().startsWith("video");
+	}
+
 }

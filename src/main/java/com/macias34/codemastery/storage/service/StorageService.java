@@ -89,12 +89,12 @@ public class StorageService {
 	/**
 	 * Deletes file from DigitalOcean Spaces
 	 *
-	 * @param fileName
+	 * @param objectName
 	 * @return
 	 */
-	public String deleteFile(final String fileName) {
-		amazonS3Client.deleteObject(bucketName, fileName);
-		return "Deleted File: " + fileName;
+	public String deleteFile(final String objectName) {
+		amazonS3Client.deleteObject(bucketName, objectName);
+		return "Deleted File: " + objectName;
 	}
 
 	/**
