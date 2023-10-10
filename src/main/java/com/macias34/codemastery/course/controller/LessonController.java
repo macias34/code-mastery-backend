@@ -62,8 +62,7 @@ public class LessonController {
             MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<LessonDto> uploadLessonVideo(
             @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "lessonId", required = false) int lessonId,
-            @RequestParam(value = "title", required = false) String title) {
+            @RequestParam(value = "lessonId", required = false) int lessonId) {
         return ResponseEntity.ok(lessonService.uploadLessonVideo(lessonId, file));
     }
 
