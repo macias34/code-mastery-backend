@@ -30,10 +30,4 @@ public class VideoService {
 		return video;
 	}
 
-	public String getVideoPresignedUrl(int id) {
-		VideoEntity video = getVideoEntityById(id);
-		String presignedUrl = storageService.generatePresignedUrl(video.getObjectName(), 2).toString();
-
-		return presignedUrl;
-	}
 }

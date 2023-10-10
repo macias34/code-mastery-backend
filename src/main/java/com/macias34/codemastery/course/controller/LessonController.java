@@ -63,7 +63,8 @@ public class LessonController {
     public ResponseEntity<LessonDto> uploadLessonVideo(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "lessonId", required = false) int lessonId) {
-        return ResponseEntity.ok(lessonService.uploadLessonVideo(lessonId, file));
+        lessonService.uploadLessonVideo(lessonId, file);
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{id}")

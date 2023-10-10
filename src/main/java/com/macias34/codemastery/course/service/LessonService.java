@@ -55,7 +55,7 @@ public class LessonService {
         return lessonMapper.fromEntityToDto(lesson);
     }
 
-    public LessonDto uploadLessonVideo(int id, MultipartFile file) {
+    public void uploadLessonVideo(int id, MultipartFile file) {
         LessonEntity lesson = getLessonEntityById(id);
 
         if (!FileUtil.isVideo(file)) {
@@ -87,7 +87,6 @@ public class LessonService {
 
         lessonRepository.save(lesson);
 
-        return lessonMapper.fromEntityToDto(lesson);
     }
 
     public LessonDto deleteLessonById(int id) {
