@@ -25,8 +25,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InformationPageController {
     private final InformationPageService informationPageService;
-
-    @GetMapping("/")
+//TODO: FIX SLUGING SYSTEM
+    @GetMapping()
     public ResponseEntity<List<InformationPageDto>> getAllInformationPages() {
         return ResponseEntity.ok(informationPageService.getAllInformationPages());
     }

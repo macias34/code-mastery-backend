@@ -23,7 +23,7 @@ public class InformationPageService {
 
     public InformationPageDto createInformationPage(CreateInformationPageDto dto){
         DtoValidator.validate(dto);
-        String slug = generateSlug(dto.getTitle());
+        String slug = generateSlug(dto.getTitle(),null);
         InformationPageEntity informationPage = new InformationPageEntity(dto.getTitle(),slug,dto.getContent());
         informationPageRepository.save(informationPage);
 
@@ -52,7 +52,7 @@ public class InformationPageService {
         InformationPageEntity informationPage = informationPageRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Information page not found"));
 
         if(dto.getTitle()!=null){
-            String slug = generateSlug(dto.getTitle());
+            String slug = generateSlug(dto.getTitle(),id);
             informationPage.setSlug(slug);
             informationPage.setTitle(dto.getTitle());
         }
@@ -73,9 +73,9 @@ public class InformationPageService {
         return informationPageMapper.fromEntityToDto(informationPage);
     }
 
-    private String generateSlug(String title){
+    private String generateSlug(String title, Integer updatingPageId){
         List<InformationPageEntity> informationPages = informationPageRepository.findInformationPageEntitiesByTitleIgnoreCase(title);
-        int count = informationPages.size();
+        int count = informationPages.stream().filter(i -> i.getId() != updatingPageId).toList().size();
         String lowercase = title.toLowerCase();
         String normalized = Normalizer.normalize(lowercase, Normalizer.Form.NFD);
         String slug = normalized.replaceAll("\\s+", "-");
