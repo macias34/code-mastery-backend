@@ -129,7 +129,7 @@ public class LessonService {
             UserDto user = userService.getUserByUsername(sessionUser.getUsername());
             boolean isUserAuthorizedForCourse = checkIfUserIsAuthorizedForCourse(user, lesson);
             if (isUserAuthorizedForCourse) {
-                String videoPresignedUrl = storageService.generatePresignedUrl(video.getObjectName(), 1).toString();
+                String videoPresignedUrl = storageService.generatePresignedUrl(video.getObjectName(), 30).toString();
                 lessonDto.setVideoSrc(videoPresignedUrl);
             }
 
