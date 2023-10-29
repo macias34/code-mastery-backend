@@ -37,6 +37,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -78,7 +79,7 @@ public class UserService {
 
     public UserResponseDto getAllUsers(UserFilter userFilter, int page, int size) {
         Specification<UserEntity> spec = UserSpecification.withFilters(userFilter);
-        Pageable paging = PageRequest.of(page, size);
+        Pageable paging = PageRequest.of(page, size, Sort.by("username"));
         Page<UserEntity> usersPage = userRepository.findAll(spec, paging);
 
         List<UserDto> userDtos = usersPage.stream().map(userMapper::fromEntityToDto).toList();
@@ -152,7 +153,7 @@ public class UserService {
         DtoValidator.validate(dto);
 
         if (dto.getUsername() != null) {
-            if (!loggedUserUsername.equals(dto.getUsername())) {
+            if (!user.getUsername().equals(dto.getUsername())) {
                 checkIfUserExists(SignUpDto.builder().username(dto.getUsername()).build());
             }
             user.setUsername(dto.getUsername());
