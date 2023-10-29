@@ -73,6 +73,7 @@ public class LessonController {
             @RequestBody UpdateLessonDto dto
 
     ) {
+        System.out.println(dto);
         return ResponseEntity.ok(lessonService.updateLessonById(id, dto));
     }
 }
