@@ -25,6 +25,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -122,12 +123,11 @@ public class LessonService {
 
         if (video != null) {
 
-            UserDetails sessionUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
+            User sessionUser = (User) SecurityContextHolder.getContext().getAuthentication()
                     .getPrincipal();
+
             UserDto user = userService.getUserByUsername(sessionUser.getUsername());
-
             boolean isUserAuthorizedForCourse = checkIfUserIsAuthorizedForCourse(user, lesson);
-
             if (isUserAuthorizedForCourse) {
                 String videoPresignedUrl = storageService.generatePresignedUrl(video.getObjectName(), 1).toString();
                 lessonDto.setVideoSrc(videoPresignedUrl);
@@ -140,7 +140,6 @@ public class LessonService {
 
     private boolean checkIfUserIsAuthorizedForCourse(UserDto user, LessonEntity lesson) {
         boolean isUserAuthorizedForCourse = false;
-
         if (user.getRole().equals(UserRole.ADMIN)) {
             isUserAuthorizedForCourse = true;
         }
