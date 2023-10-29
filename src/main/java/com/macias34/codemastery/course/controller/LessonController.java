@@ -75,3 +75,4 @@ public class LessonController {
     ) {
         return ResponseEntity.ok(lessonService.updateLessonById(id, dto));
     }
+}
