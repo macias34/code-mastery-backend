@@ -5,6 +5,10 @@ target/
 !**/src/test/**/target/
 .env
 
+#uploads
+src/main/resources/uploads
+src/main/resources/avatars
+
 ### STS ###
 .apt_generated
 .classpath
