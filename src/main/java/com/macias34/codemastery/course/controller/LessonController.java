@@ -40,16 +40,6 @@ public class LessonController {
         return ResponseEntity.ok(lessonService.getLessonById(id));
     }
 
-    @GetMapping("/file/{id}")
-    public ResponseEntity<Resource> getLessonFileById(
-            @PathVariable int id) {
-        // TODO Check if user bought course
-        Resource resource = lessonService.getLessonFileById(id);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_TYPE, "video/mp4") // Displaying file
-                .body(resource);
-    }
-
     @GetMapping("/chapter/{id}")
     public ResponseEntity<List<LessonDto>> getLessonsByChapterId(
             @PathVariable int id) {
@@ -62,15 +52,19 @@ public class LessonController {
         return ResponseEntity.ok(lessonService.deleteLessonById(id));
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PostMapping("")
     public ResponseEntity<LessonDto> createLesson(
+            @RequestBody CreateLessonDto dto) {
+        return ResponseEntity.ok(lessonService.createLesson(dto));
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/upload-video", consumes = {
+            MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<LessonDto> uploadLessonVideo(
             @RequestParam("file") MultipartFile file,
-            // All RequestParam which are part of dto has required=false in order to get
-            // validated by DtoValidator
-            @RequestParam(value = "chapterId", required = false) int chapterId,
-            @RequestParam(value = "name", required = false) String name) {
-        CreateLessonDto dto = new CreateLessonDto(name, chapterId);
-        return ResponseEntity.ok(lessonService.createLesson(dto, file));
+            @RequestParam(value = "lessonId", required = false) int lessonId) {
+        lessonService.uploadLessonVideo(lessonId, file);
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{id}")

@@ -10,7 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CreateChapterDto {
     @NotNull
-    private String name;
+    private String title;
     @NotNull
     private int courseId;
 }

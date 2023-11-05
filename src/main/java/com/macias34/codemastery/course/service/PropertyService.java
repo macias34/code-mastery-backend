@@ -14,7 +14,11 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -64,5 +68,27 @@ public class PropertyService {
         }
 
         return propertyMapper.fromEntityToDto(property);
+    }
+
+    @Transactional
+    public List<PropertyDto> overrideCourseProperties(int id, List<UpdatePropertyDto> dtos){
+        for(UpdatePropertyDto dto: dtos){
+            DtoValidator.validate(dto);
+        }
+        CourseEntity courseEntity = courseRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+
+        System.out.println(courseEntity.getProperties().size());
+        propertyRepository.deleteAll(courseEntity.getProperties());
+        List<PropertyEntity> propertiesToSave = new ArrayList<>();
+        for(UpdatePropertyDto dto: dtos){
+            PropertyEntity property = new PropertyEntity(dto.getLabel(),dto.getValue(),courseEntity);
+            propertiesToSave.add(property);
+        }
+
+        courseEntity.setProperties(new HashSet<>(propertiesToSave));
+        propertyRepository.saveAll(propertiesToSave);
+        courseRepository.save(courseEntity);
+
+        return propertiesToSave.stream().map(propertyMapper::fromEntityToDto).toList();
     }
 }

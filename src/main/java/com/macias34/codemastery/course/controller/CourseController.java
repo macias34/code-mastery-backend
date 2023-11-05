@@ -42,7 +42,7 @@ public class CourseController {
     private CourseRepository courseRepository;
     private CustomUserDetailsService customUserDetailsService;
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<CourseResponseDto> searchCourses(
             @RequestParam(required = false) String name,
             @RequestParam(defaultValue = "0") Double minPrice,
@@ -68,46 +68,26 @@ public class CourseController {
         return ResponseEntity.ok(courseService.deleteCourseById(id));
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<CourseDto> createCourse(
-            @RequestParam(value = "avatar") MultipartFile avatar,
-            // All RequestParam which are part of dto has required=false in order to get
-            // validated by DtoValidator
-            @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "price", required = false) Double price,
-            @RequestParam(value = "instructorName", required = false) String instructorName,
-            @RequestParam(value = "description", required = false) String description,
-            @RequestParam(value = "categoriesIds", required = false) Set<Integer> categoriesIds
+    @RequestMapping(method = RequestMethod.POST, value = "")
+    public ResponseEntity<CourseDto> createCourse() {
 
-    ) {
-        CreateCourseDto dto = new CreateCourseDto(name, price, instructorName, description, categoriesIds);
-        return ResponseEntity.ok(courseService.createCourse(dto, avatar));
+        return ResponseEntity.ok(courseService.createCourse());
     }
 
-    @RequestMapping(method = RequestMethod.PATCH, value = "/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @RequestMapping(method = RequestMethod.PATCH, value = "/{id}")
     public ResponseEntity<CourseDto> updateCourse(
-            @RequestParam(value = "avatar", required = false) MultipartFile avatar,
-            @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "price", required = false) Double price,
-            @RequestParam(value = "instructorName", required = false) String instructorName,
-            @RequestParam(value = "description", required = false) String description,
-            @RequestParam(value = "categoriesIds", required = false) Set<Integer> categoriesIds,
-            @PathVariable int id
+            @PathVariable int id, @RequestBody UpdateCourseDto updateCourseDto
 
     ) {
-        UpdateCourseDto dto = new UpdateCourseDto(name, price, instructorName, description, categoriesIds);
-        return ResponseEntity.ok(courseService.updateCourse(id, dto, avatar));
+        return ResponseEntity.ok(courseService.updateCourse(id, updateCourseDto));
     }
 
-    @GetMapping("/avatar/{id}")
-    public ResponseEntity<Resource> getCourseAvatarById(
-            @PathVariable int id) {
-        Resource image = courseService.getCourseAvatarById(id);
-        Tika tika = new Tika();
-        String mimeType = tika.detect(image.getFilename());
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_TYPE, mimeType)
-                .body(image);
+    @RequestMapping(method = RequestMethod.PATCH, value = "/{id}/thumbnail", consumes = {
+            MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<Void> updateCourseThumbnail(
+            @PathVariable int id, @RequestParam("file") MultipartFile file) {
+        courseService.updateCourseThumbnail(id, file);
+        return ResponseEntity.ok().build();
     }
+
 }

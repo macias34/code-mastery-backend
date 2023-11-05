@@ -9,8 +9,9 @@ import java.sql.Timestamp;
 @Setter
 public class LessonDto {
     private int id;
-    private String name;
+    private String title;
     private int chapterId;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    private String videoSrc;
 }

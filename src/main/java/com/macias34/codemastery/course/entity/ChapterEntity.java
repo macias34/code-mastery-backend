@@ -33,12 +33,12 @@ public class ChapterEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String name;
+    private String title;
 
-    @OneToMany(mappedBy = "chapter",cascade = CascadeType.ALL,fetch=FetchType.LAZY)
+    @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<LessonEntity> lessons;
 
-    @ManyToOne(fetch= FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", referencedColumnName = "id")
     private CourseEntity course;
 
@@ -49,8 +49,8 @@ public class ChapterEntity {
     @UpdateTimestamp
     private Timestamp updatedAt;
 
-    public ChapterEntity(String name, CourseEntity course){
-        this.name = name;
+    public ChapterEntity(String title, CourseEntity course) {
+        this.title = title;
         this.course = course;
     }
 }
