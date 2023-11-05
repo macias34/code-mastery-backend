@@ -57,7 +57,8 @@ public class CourseService {
 
     public CourseResponseDto searchCourses(CourseFilter courseFilter, int page, int size) {
         Pageable paging = PageRequest.of(page, size);
-        Page<CourseEntity> coursesPage = this.courseRepository.searchCourseEntitiesByFilters(courseFilter, paging);
+//        TODO: add filters
+        Page<CourseEntity> coursesPage = this.courseRepository.findAll(paging);
         List<CourseEntity> courses = coursesPage.getContent();
 
         if (courses.isEmpty()) {
