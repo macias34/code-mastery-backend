@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @Tag(name = "property")
 @RequestMapping("/property")
@@ -36,6 +38,13 @@ public class PropertyController {
             @RequestBody UpdatePropertyDto dto,
             @PathVariable Integer id) {
         return ResponseEntity.ok(propertyService.updateProperty(id, dto));
+    }
+
+    @PatchMapping("/course/{id}")
+    public ResponseEntity<List<PropertyDto>> overrideProperties(
+            @RequestBody List<UpdatePropertyDto> dto,
+            @PathVariable Integer id) {
+        return ResponseEntity.ok(propertyService.overrideCourseProperties(id, dto));
     }
 
     @DeleteMapping("/{id}")
