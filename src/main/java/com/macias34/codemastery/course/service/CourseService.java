@@ -45,6 +45,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -70,7 +71,13 @@ public class CourseService {
             throw new ResourceNotFoundException("Courses not found");
         }
 
-        List<CourseDto> courseDtos = courses.stream().map(courseMapper::fromEntityToDto).toList();
+        List<CourseDto> courseDtos = courses.stream().map(course -> {
+            CourseDto courseDto = courseMapper.fromEntityToDto(course);
+            if (course.getThumbnail() != null) {
+                courseDto.setThumbnailSrc(course.getThumbnail().getSrc());
+            }
+            return courseDto;
+        }).collect(Collectors.toList());
 
         return CourseResponseDto.builder().currentPage(page)
                 .totalElements(coursesPage.getTotalElements())
@@ -81,7 +88,10 @@ public class CourseService {
     public CourseDto getCourseById(int id) {
         CourseEntity course = findCourseOrThrow(id);
 
-        return courseMapper.fromEntityToDto(course);
+        CourseDto courseDto = courseMapper.fromEntityToDto(course);
+        courseDto.setThumbnailSrc(course.getThumbnail().getSrc());
+
+        return courseDto;
     }
 
     @Transactional
@@ -118,22 +128,26 @@ public class CourseService {
     }
 
     @Transactional
-    public void updateCourseThumbnail(CourseEntity course, MultipartFile file) {
+    public ThumbnailEntity updateCourseThumbnail(int id, MultipartFile file) {
         if (!FileUtil.isImage(file)) {
             throw new BadRequestException("Uploaded thumbnail isn't an image type.");
         }
+
+        CourseEntity course = findCourseOrThrow(id);
 
         String fileExtension = FileUtil.getFileExtension(file);
         String fileName = "thumbnail-" + course.getId();
         String objectName = "public/thumbnails/" + fileName + fileExtension;
         StorageFile storageFile = storageService.uploadPublicFile(fileName, objectName, file);
+        System.out.println(storageFile);
 
         ThumbnailEntity thumbnailEntity = new ThumbnailEntity(storageFile.getSrc(), storageFile.getFileName(),
                 storageFile.getObjectName(), course);
+        System.out.println(thumbnailEntity);
 
         thumbnailRepository.save(thumbnailEntity);
 
-        course.setThumbnail(thumbnailEntity);
+        return thumbnailEntity;
     }
 
     @Transactional
@@ -165,10 +179,14 @@ public class CourseService {
             course.setInstructorName(dto.getInstructorName());
         }
 
-        updateCourseThumbnail(course, thumbnailImage);
+        ThumbnailEntity thumbnailEntity = updateCourseThumbnail(course.getId(), thumbnailImage);
+        course.setThumbnail(thumbnailEntity);
 
         courseRepository.save(course);
 
-        return courseMapper.fromEntityToDto(course);
+        CourseDto courseDto = courseMapper.fromEntityToDto(course);
+        courseDto.setThumbnailSrc(course.getThumbnail().getSrc());
+
+        return courseDto;
     }
 }
