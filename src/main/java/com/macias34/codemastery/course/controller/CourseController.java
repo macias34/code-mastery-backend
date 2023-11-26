@@ -2,29 +2,17 @@ package com.macias34.codemastery.course.controller;
 
 import com.macias34.codemastery.course.dto.course.CourseDto;
 import com.macias34.codemastery.course.dto.course.CourseResponseDto;
-import com.macias34.codemastery.course.dto.course.CreateCourseDto;
 import com.macias34.codemastery.course.dto.course.UpdateCourseDto;
 import com.macias34.codemastery.course.model.CourseFilter;
-import com.macias34.codemastery.course.repository.CourseRepository;
 import com.macias34.codemastery.course.service.CourseService;
-import com.macias34.codemastery.security.service.CustomUserDetailsService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.apache.tika.Tika;
-import org.springframework.core.io.Resource;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,8 +27,6 @@ import java.util.Set;
 @AllArgsConstructor
 public class CourseController {
     private CourseService courseService;
-    private CourseRepository courseRepository;
-    private CustomUserDetailsService customUserDetailsService;
 
     @GetMapping("")
     public ResponseEntity<CourseResponseDto> searchCourses(
@@ -76,10 +62,18 @@ public class CourseController {
 
     @RequestMapping(method = RequestMethod.PATCH, value = "/{id}")
     public ResponseEntity<CourseDto> updateCourse(
-            @PathVariable int id, @RequestBody UpdateCourseDto updateCourseDto
+            @PathVariable int id,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "price", required = false) Double price,
+            @RequestParam(value = "instructorName", required = false) String instructorName,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "categoriesIds", required = false) Set<Integer> categoriesIds,
+            @RequestParam(value = "thumbnailSrc", required = false) String thumbnailSrc,
+            @RequestParam(value = "thumbnailImage", required = false) MultipartFile thumbnailImage) {
+        UpdateCourseDto updateCourseDto = new UpdateCourseDto(name, price, instructorName, description, categoriesIds,
+                thumbnailSrc);
 
-    ) {
-        return ResponseEntity.ok(courseService.updateCourse(id, updateCourseDto));
+        return ResponseEntity.ok(courseService.updateCourse(id, updateCourseDto, thumbnailImage));
     }
 
     @RequestMapping(method = RequestMethod.PATCH, value = "/{id}/thumbnail", consumes = {

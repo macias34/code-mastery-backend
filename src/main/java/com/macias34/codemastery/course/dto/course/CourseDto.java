@@ -27,4 +27,5 @@ public class CourseDto {
     private Set<CategoryDto> categories;
     private Set<PropertyDto> properties;
     private List<ChapterDto> chapters;
+    private String thumbnailSrc;
 }

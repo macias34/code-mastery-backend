@@ -17,6 +17,7 @@ import com.macias34.codemastery.course.repository.ThumbnailRepository;
 import com.macias34.codemastery.exception.BadRequestException;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
 import com.macias34.codemastery.exception.StorageException;
+import com.macias34.codemastery.storage.entity.Base64DecodedMultipartFile;
 import com.macias34.codemastery.storage.entity.StorageFile;
 import com.macias34.codemastery.storage.service.StorageService;
 import com.macias34.codemastery.util.DateTimeUtil;
@@ -30,12 +31,16 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.UnsupportedMediaTypeStatusException;
 
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -57,8 +62,8 @@ public class CourseService {
 
     public CourseResponseDto searchCourses(CourseFilter courseFilter, int page, int size) {
         Pageable paging = PageRequest.of(page, size);
-//        TODO: add filters
-        Page<CourseEntity> coursesPage = this.courseRepository.searchCourseEntitiesByFilters(courseFilter,paging);
+        // TODO: add filters
+        Page<CourseEntity> coursesPage = this.courseRepository.searchCourseEntitiesByFilters(courseFilter, paging);
         List<CourseEntity> courses = coursesPage.getContent();
 
         if (courses.isEmpty()) {
@@ -113,15 +118,13 @@ public class CourseService {
     }
 
     @Transactional
-    public void updateCourseThumbnail(int id, MultipartFile file) {
+    public void updateCourseThumbnail(CourseEntity course, MultipartFile file) {
         if (!FileUtil.isImage(file)) {
             throw new BadRequestException("Uploaded thumbnail isn't an image type.");
         }
 
-        CourseEntity course = findCourseOrThrow(id);
-
         String fileExtension = FileUtil.getFileExtension(file);
-        String fileName = "thumbnail-" + id;
+        String fileName = "thumbnail-" + course.getId();
         String objectName = "public/thumbnails/" + fileName + fileExtension;
         StorageFile storageFile = storageService.uploadPublicFile(fileName, objectName, file);
 
@@ -134,7 +137,7 @@ public class CourseService {
     }
 
     @Transactional
-    public CourseDto updateCourse(int id, UpdateCourseDto dto) {
+    public CourseDto updateCourse(int id, UpdateCourseDto dto, MultipartFile thumbnailImage) {
         DtoValidator.validate(dto);
 
         CourseEntity course = findCourseOrThrow(id);
@@ -161,6 +164,8 @@ public class CourseService {
         if (dto.getInstructorName() != null) {
             course.setInstructorName(dto.getInstructorName());
         }
+
+        updateCourseThumbnail(course, thumbnailImage);
 
         courseRepository.save(course);
 
