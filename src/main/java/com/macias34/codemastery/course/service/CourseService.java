@@ -89,7 +89,9 @@ public class CourseService {
         CourseEntity course = findCourseOrThrow(id);
 
         CourseDto courseDto = courseMapper.fromEntityToDto(course);
-        courseDto.setThumbnailSrc(course.getThumbnail().getSrc());
+        if (course.getThumbnail() != null) {
+            courseDto.setThumbnailSrc(course.getThumbnail().getSrc());
+        }
 
         return courseDto;
     }
@@ -143,7 +145,6 @@ public class CourseService {
 
         ThumbnailEntity thumbnailEntity = new ThumbnailEntity(storageFile.getSrc(), storageFile.getFileName(),
                 storageFile.getObjectName(), course);
-        System.out.println(thumbnailEntity);
 
         thumbnailRepository.save(thumbnailEntity);
 
@@ -179,14 +180,18 @@ public class CourseService {
             course.setInstructorName(dto.getInstructorName());
         }
 
-        ThumbnailEntity thumbnailEntity = updateCourseThumbnail(course.getId(), thumbnailImage);
-        course.setThumbnail(thumbnailEntity);
+        if (thumbnailImage != null) {
+            ThumbnailEntity thumbnail = updateCourseThumbnail(id, thumbnailImage);
+            course.setThumbnail(thumbnail);
+        }
 
         courseRepository.save(course);
 
         CourseDto courseDto = courseMapper.fromEntityToDto(course);
-        courseDto.setThumbnailSrc(course.getThumbnail().getSrc());
+        if (course.getThumbnail() != null) {
+            courseDto.setThumbnailSrc(course.getThumbnail().getSrc());
 
+        }
         return courseDto;
     }
 }
