@@ -11,10 +11,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CourseRepository extends JpaRepository<CourseEntity,Integer> {
-    @Query("SELECT c FROM CourseEntity c INNER JOIN c.categories cat WHERE (:#{#courseFilter.name} is null OR c.name ilike %:#{#courseFilter.name}%)" +
+    @Query("SELECT c FROM CourseEntity c " +
+            "WHERE (:#{#courseFilter.name} is null OR c.name ilike %:#{#courseFilter.name}%)" +
             "AND (:#{#courseFilter.minPrice} is null OR c.price >= :#{#courseFilter.minPrice})" +
-            "AND (:#{#courseFilter.maxPrice} is null OR c.price <= :#{#courseFilter.maxPrice})" +
-            "AND (:#{#courseFilter.minParticipantsCount} is null OR c.participantsCount >= :#{#courseFilter.minParticipantsCount})" +
-            "AND (:#{#courseFilter.categoryId} = 0 OR cat.id = :#{#courseFilter.categoryId})")
-    Page<CourseEntity> searchCourseEntitiesByFilters(@Param("courseFilter")CourseFilter courseFilter, Pageable paging);
+            "AND (:#{#courseFilter.maxPrice} is null OR c.price <= :#{#courseFilter.maxPrice})"
+    )
+   Page<CourseEntity> searchCourseEntitiesByFilters(@Param("courseFilter")CourseFilter courseFilter, Pageable paging);
 }
