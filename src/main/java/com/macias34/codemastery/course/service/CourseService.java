@@ -17,6 +17,7 @@ import com.macias34.codemastery.course.repository.ThumbnailRepository;
 import com.macias34.codemastery.exception.BadRequestException;
 import com.macias34.codemastery.exception.ResourceNotFoundException;
 import com.macias34.codemastery.exception.StorageException;
+import com.macias34.codemastery.storage.entity.Base64DecodedMultipartFile;
 import com.macias34.codemastery.storage.entity.StorageFile;
 import com.macias34.codemastery.storage.service.StorageService;
 import com.macias34.codemastery.util.DateTimeUtil;
@@ -30,16 +31,21 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.UnsupportedMediaTypeStatusException;
 
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -57,15 +63,21 @@ public class CourseService {
 
     public CourseResponseDto searchCourses(CourseFilter courseFilter, int page, int size) {
         Pageable paging = PageRequest.of(page, size);
-//        TODO: add filters
-        Page<CourseEntity> coursesPage = this.courseRepository.searchCourseEntitiesByFilters(courseFilter,paging);
+        // TODO: add filters
+        Page<CourseEntity> coursesPage = this.courseRepository.searchCourseEntitiesByFilters(courseFilter, paging);
         List<CourseEntity> courses = coursesPage.getContent();
 
         if (courses.isEmpty()) {
             throw new ResourceNotFoundException("Courses not found");
         }
 
-        List<CourseDto> courseDtos = courses.stream().map(courseMapper::fromEntityToDto).toList();
+        List<CourseDto> courseDtos = courses.stream().map(course -> {
+            CourseDto courseDto = courseMapper.fromEntityToDto(course);
+            if (course.getThumbnail() != null) {
+                courseDto.setThumbnailSrc(course.getThumbnail().getSrc());
+            }
+            return courseDto;
+        }).collect(Collectors.toList());
 
         return CourseResponseDto.builder().currentPage(page)
                 .totalElements(coursesPage.getTotalElements())
@@ -76,7 +88,12 @@ public class CourseService {
     public CourseDto getCourseById(int id) {
         CourseEntity course = findCourseOrThrow(id);
 
-        return courseMapper.fromEntityToDto(course);
+        CourseDto courseDto = courseMapper.fromEntityToDto(course);
+        if (course.getThumbnail() != null) {
+            courseDto.setThumbnailSrc(course.getThumbnail().getSrc());
+        }
+
+        return courseDto;
     }
 
     @Transactional
@@ -113,7 +130,7 @@ public class CourseService {
     }
 
     @Transactional
-    public void updateCourseThumbnail(int id, MultipartFile file) {
+    public ThumbnailEntity updateCourseThumbnail(int id, MultipartFile file) {
         if (!FileUtil.isImage(file)) {
             throw new BadRequestException("Uploaded thumbnail isn't an image type.");
         }
@@ -121,20 +138,21 @@ public class CourseService {
         CourseEntity course = findCourseOrThrow(id);
 
         String fileExtension = FileUtil.getFileExtension(file);
-        String fileName = "thumbnail-" + id;
+        String fileName = "thumbnail-" + course.getId();
         String objectName = "public/thumbnails/" + fileName + fileExtension;
         StorageFile storageFile = storageService.uploadPublicFile(fileName, objectName, file);
+        System.out.println(storageFile);
 
         ThumbnailEntity thumbnailEntity = new ThumbnailEntity(storageFile.getSrc(), storageFile.getFileName(),
                 storageFile.getObjectName(), course);
 
         thumbnailRepository.save(thumbnailEntity);
 
-        course.setThumbnail(thumbnailEntity);
+        return thumbnailEntity;
     }
 
     @Transactional
-    public CourseDto updateCourse(int id, UpdateCourseDto dto) {
+    public CourseDto updateCourse(int id, UpdateCourseDto dto, MultipartFile thumbnailImage) {
         DtoValidator.validate(dto);
 
         CourseEntity course = findCourseOrThrow(id);
@@ -162,8 +180,18 @@ public class CourseService {
             course.setInstructorName(dto.getInstructorName());
         }
 
+        if (thumbnailImage != null) {
+            ThumbnailEntity thumbnail = updateCourseThumbnail(id, thumbnailImage);
+            course.setThumbnail(thumbnail);
+        }
+
         courseRepository.save(course);
 
-        return courseMapper.fromEntityToDto(course);
+        CourseDto courseDto = courseMapper.fromEntityToDto(course);
+        if (course.getThumbnail() != null) {
+            courseDto.setThumbnailSrc(course.getThumbnail().getSrc());
+
+        }
+        return courseDto;
     }
 }

@@ -27,4 +27,7 @@ public class UpdateCourseDto {
     private String description;
     @Nullable
     private Set<Integer> categoriesIds;
+    @Nullable
+    @Size(min = 3)
+    private String thumbnailSrc;
 }
