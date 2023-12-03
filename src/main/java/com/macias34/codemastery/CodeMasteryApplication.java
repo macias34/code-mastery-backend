@@ -15,6 +15,7 @@ public class CodeMasteryApplication {
 			System.setProperty(entry.getKey(), entry.getValue());
 		});
 
+
 		SpringApplication.run(CodeMasteryApplication.class, args);
 	}
 
