@@ -27,6 +27,7 @@ public class OrderService {
 
     public void createOrder(CreateOrderRequestDto dto){
         CourseEntity courseEntity = courseRepository.findById(dto.getCourseId()).orElseThrow(ResourceNotFoundException::new);
+        courseEntity.setParticipantsCount(courseEntity.getParticipantsCount() + 1);
         UserEntity userEntity = userRepository.findById(dto.getUserId()).orElseThrow(ResourceNotFoundException::new);
 
         Set<CourseEntity> usersCourses = userEntity.getCourses();
@@ -40,6 +41,7 @@ public class OrderService {
                 .price(courseEntity.getPrice())
                 .user(userEntity).build();
 
+        courseRepository.save(courseEntity);
         userRepository.save(userEntity);
         orderRepository.save(order);
     }

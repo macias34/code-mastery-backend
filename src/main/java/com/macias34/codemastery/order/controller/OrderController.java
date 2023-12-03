@@ -31,7 +31,7 @@ public class OrderController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("")
+    @GetMapping()
     public ResponseEntity<List<OrderDto>> getAllOrders(){
         List<OrderDto> orderDto = orderService.getOrders();
         return ResponseEntity.ok(orderDto);
