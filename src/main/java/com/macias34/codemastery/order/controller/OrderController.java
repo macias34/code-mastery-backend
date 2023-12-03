@@ -31,13 +31,13 @@ public class OrderController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/get")
+    @GetMapping()
     public ResponseEntity<List<OrderDto>> getAllOrders(){
         List<OrderDto> orderDto = orderService.getOrders();
         return ResponseEntity.ok(orderDto);
     }
 
-    @PostMapping("/get/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<OrderDto> getOrderById(
             @PathVariable("id") int id
     ){
